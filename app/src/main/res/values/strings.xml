@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Devourer OpenGL</string>
+    <string name="button_load_game_text">Загрузить игру</string>
+    <string name="button_new_game_text">Новая игра</string>
+    <string name="button_settings_text">Настройки</string>
+    <string name="button_achievements_text">Достижения</string>
+    <string name="button_exit_text">Выйти из игры</string>
+    <string name="game_title">DEVOURER</string>
+    <string name="button_about_text">\?</string>
+    <string name="map_delimiter">" "</string>
+</resources>
