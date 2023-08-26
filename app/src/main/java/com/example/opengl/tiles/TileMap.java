@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class TileMap {
-    private final List<Tile> synList;
+    private final List<Tile> tileList;
     private final int tileMapWidth;
     private final int tileMapHeight;
     private final Properties mapProperties;
@@ -43,15 +43,15 @@ public class TileMap {
         for (int i = 0; i < arraySize; i++) {
             initList.add(new Tile());
         }
-        synList = Collections.synchronizedList(initList);
+        tileList = Collections.synchronizedList(initList);
     }
 
     public Tile getTile(int x, int y) {
-        return synList.get(getTileIndex(x, y));
+        return tileList.get(getTileIndex(x, y));
     }
 
     public void setTile(Tile tile, int x, int y) {
-        synList.set(getTileIndex(x, y), tile);
+        tileList.set(getTileIndex(x, y), tile);
     }
 
     private int getTileIndex(int x, int y) {
@@ -136,7 +136,7 @@ public class TileMap {
     }
 
     private void readMinerals(InputStream inputStream) {
-        synchronized (synList) {
+        synchronized (tileList) {
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 String prefix = "mineral_";
@@ -338,7 +338,7 @@ public class TileMap {
 
     public List<Short> getTileMapData() {
         List<Short> result = new ArrayList<>();
-        synchronized (synList) {
+        synchronized (tileList) {
             Tile tile;
             for (int y = 0; y < tileMapHeight; y++) {
                 for (int x = 0; x < tileMapWidth; x++) {
@@ -436,6 +436,7 @@ public class TileMap {
         return isExist;
     }
 
+    @NonNull
     private int[][] getNearIndexes(int indX, int indY) {
         int[][] nearInd = new int[6][2];
         if (indX % 2 == 0) {
@@ -470,7 +471,7 @@ public class TileMap {
 
     public void placeDevourerTile(int mapIndX, int mapIndY) {
         if (isNearEntityExist(mapIndX, mapIndY)) {
-            synchronized (synList) {
+            synchronized (tileList) {
                 getTile(mapIndX, mapIndY).setEntity(new EntityTransport());
                 fixNearTile(mapIndX, mapIndY);
                 generateFogMap(); // todo generate not full map, only part
@@ -480,9 +481,11 @@ public class TileMap {
 
     public void deleteDevourerTile(int mapIndX, int mapIndY) {
         if (isEntity(mapIndX, mapIndY)) {
-            getTile(mapIndX, mapIndY).setEntity(null);
-            fixNearTile(mapIndX, mapIndY);
-            generateFogMap(); // todo generate not full map, only part
+            synchronized (tileList) {
+                getTile(mapIndX, mapIndY).setEntity(null);
+                fixNearTile(mapIndX, mapIndY);
+                generateFogMap(); // todo generate not full map, only part
+            }
         }
     }
 

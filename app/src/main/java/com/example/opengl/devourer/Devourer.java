@@ -1,10 +1,12 @@
 package com.example.opengl.devourer;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.example.opengl.Game;
 import com.example.opengl.Position;
+import com.example.opengl.PositionInd;
 import com.example.opengl.Resource;
-import com.example.opengl.ResourceDepository;
-import com.example.opengl.tiles.Mineral;
 import com.example.opengl.tiles.TileMap;
 
 import java.nio.FloatBuffer;
@@ -16,7 +18,6 @@ public class Devourer {
     private final TileMap tileMap;
     private final DevourerStructure devourerStructure;
     private final List<Resource> movingResources = Collections.synchronizedList(new ArrayList<>());
-    //private final List<ResourceDepository> resourceDepositoryList = Collections.synchronizedList(new ArrayList<>());
     private final float betweenTileCentersX;
     private final float betweenTileCentersY;
 
@@ -26,23 +27,7 @@ public class Devourer {
         this.betweenTileCentersY = betweenTileCentersY;
         this.devourerStructure = new DevourerStructure();
         devourerStructure.createStructure(tileMap);
-        //initResourceDepositoryList();
     }
-
-    /*
-    private void initResourceDepositoryList() {
-        resourceDepositoryList.clear();
-        Mineral mineral;
-        for (int y = 0; y < tileMap.getTileMapHeight(); y++) {
-            for (int x = 0; x < tileMap.getTileMapWidth(); x++) {
-                mineral = tileMap.getTile(x, y).getMineral();
-                if (mineral != null) {
-                    resourceDepositoryList.add(mineral.resourceDepository);
-                }
-            }
-        }
-    }
-     */
 
     public DevourerNode getDevourerNode(int x, int y) {
         return devourerStructure.getDevourerNode(x, y);
@@ -51,7 +36,9 @@ public class Devourer {
     public boolean moveResources() {
         if (movingResources.size() > 0) {
             for (Resource resource : movingResources) {
-                resource.move(0.1f);
+                if (resource.isMoving) {
+                    resource.move(0.1f);
+                }
             }
             return true;
         } else {
@@ -64,27 +51,23 @@ public class Devourer {
             startEatingMineral(indX, indY);
         } else {
             tileMap.placeDevourerTile(indX, indY);
-            devourerStructure.addEntityNode(indX, indY, tileMap);
+            devourerStructure.addDevourerNode(indX, indY, tileMap);
             Game.getInstance().showMessage("indX:" + indX + " indY:" + indY + " tile:" + tileMap.getTile(indX, indY).getEntity());
         }
     }
 
     private void startEatingMineral(int indX, int indY) {
         tileMap.placeDevourerTile(indX, indY);
-        devourerStructure.addEntityNode(indX, indY, tileMap);
+        devourerStructure.addDevourerNode(indX, indY, tileMap);
         DevourerNode devourerNode = devourerStructure.getDevourerNode(indX, indY);
         if (devourerNode != null) {
-            tileMap.getTile(indX, indY).getMineral().resourceDepository.startResourceMining(devourerNode, calculateDevourerNodePosition(devourerNode), movingResources);
-            /*
-            Resource resource = tileMap.getTile(indX, indY).getMineral().resourceDepository.takeResource();
-            resource.startResource(devourerNode, calculateDevourerNodePosition(devourerNode));
-            movingResources.add(resource);
-             */
+            tileMap.getTile(indX, indY).getMineral().resourceDepository.startResourceMining(indX, indY, devourerStructure, calculateDevourerNodePosition(new PositionInd(indX, indY)), movingResources);
         }
     }
 
     public void deleteDevourer(int indX, int indY) {
         tileMap.deleteDevourerTile(indX, indY);
+        devourerStructure.removeDevourerNode(indX, indY, tileMap);
         Game.getInstance().showMessage("indX:" + indX + " indY:" + indY + " tile:" + tileMap.getTile(indX, indY).getBasis());
     }
 
@@ -93,9 +76,11 @@ public class Devourer {
             List<Float> resourcesData = new ArrayList<>();
             for (Resource resource : movingResources) {
                 Position position = calculateResourcePosition(resource);
-                resourcesData.add(position.x);
-                resourcesData.add(position.y);
-                resourcesData.add(0f); // tile number
+                if (position != null) {
+                    resourcesData.add(position.x);
+                    resourcesData.add(position.y);
+                    resourcesData.add(0f); // tile number
+                }
             }
             if (resourcesData.size() == 0) return null;
             FloatBuffer result = FloatBuffer.allocate(resourcesData.size());
@@ -106,25 +91,30 @@ public class Devourer {
         }
     }
 
-    private Position calculateDevourerNodePosition(DevourerNode devourerNode) {
+    @NonNull
+    private Position calculateDevourerNodePosition(@NonNull PositionInd positionInd) {
         Position result = new Position();
-        result.x = devourerNode.x * betweenTileCentersX;
-        if (devourerNode.x % 2 == 0) {
-            result.y = devourerNode.y * betweenTileCentersY;
+        result.x = positionInd.x * betweenTileCentersX;
+        if (positionInd.x % 2 == 0) {
+            result.y = positionInd.y * betweenTileCentersY;
         } else {
-            result.y = (devourerNode.y + 0.5f) * betweenTileCentersY;
+            result.y = (positionInd.y + 0.5f) * betweenTileCentersY;
         }
         return result;
     }
 
-    private Position calculateResourcePosition(Resource resource) {
+    @Nullable
+    private Position calculateResourcePosition(@NonNull Resource resource) { // interpolation
         Position result = new Position();
         if (resource.nextPosition == null) {
-            resource.nextPosition = calculateDevourerNodePosition(resource.nextDevourerNode);
+            if (resource.nextPositionInd != null) {
+                resource.nextPosition = calculateDevourerNodePosition(resource.nextPositionInd);
+            } else {
+                return null;
+            }
         }
         result.x = resource.startPosition.x + (resource.nextPosition.x - resource.startPosition.x) * resource.distance;
         result.y = resource.startPosition.y + (resource.nextPosition.y - resource.startPosition.y) * resource.distance;
         return result;
     }
-
 }

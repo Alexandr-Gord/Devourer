@@ -9,12 +9,13 @@ import com.example.opengl.tiles.TileMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
 public class DevourerStructure {
-    Map<Integer, DevourerNode> map = new HashMap<>();
+    private final Map<Integer, DevourerNode> map = Collections.synchronizedMap(new HashMap<>());
     public DevourerNode main;
 
     private static final int[] NEIGHBOR_DX = {0, 1, 1, 0, -1, -1};
@@ -45,42 +46,44 @@ public class DevourerStructure {
     }
 
     public void createStructure(@NonNull TileMap tileMap) {
-        this.main = new DevourerNode(tileMap.getMainEntityTileIndX(), tileMap.getMainEntityTileIndY(), 0);
-        map.clear();
-        map.put(getIndex(main.x, main.y), main);
+        synchronized (map) {
+            this.main = new DevourerNode(tileMap.getMainEntityTileIndX(), tileMap.getMainEntityTileIndY(), 0);
+            map.clear();
+            map.put(getIndex(main.x, main.y), main);
 
-        int x, y, index;
-        DevourerNode neighbor;
+            int x, y, index;
+            DevourerNode neighbor;
 
-        Queue<DevourerNode> q = new ArrayDeque<>();
-        q.add(main);
+            Queue<DevourerNode> q = new ArrayDeque<>();
+            q.add(main);
 
-        while (!q.isEmpty()) {
-            DevourerNode node = q.poll();
-            int newDist = node.dist + 1;
+            while (!q.isEmpty()) {
+                DevourerNode node = q.poll();
+                int newDist = node.dist + 1;
 
-            for (int k = 0; k < 6; k++) {
-                x = node.x + NEIGHBOR_DX[k];
-                if (node.x % 2 == 0) {
-                    y = node.y + NEIGHBOR_EVEN_X_DY[k];
-                } else {
-                    y = node.y + NEIGHBOR_ODD_X_DY[k];
-                }
-                if (isValid(tileMap, x, y)) {
-                    index = getIndex(x, y);
-                    neighbor = map.get(index);
-                    if (neighbor == null) {
-                        DevourerNode newNeighbor = new DevourerNode(x, y, newDist);
-                        node.neighbors.add(newNeighbor);
-                        q.add(newNeighbor);
-                        map.put(index, newNeighbor);
+                for (int k = 0; k < 6; k++) {
+                    x = node.x + NEIGHBOR_DX[k];
+                    if (node.x % 2 == 0) {
+                        y = node.y + NEIGHBOR_EVEN_X_DY[k];
                     } else {
+                        y = node.y + NEIGHBOR_ODD_X_DY[k];
+                    }
+                    if (isValid(tileMap, x, y)) {
+                        index = getIndex(x, y);
+                        neighbor = map.get(index);
+                        if (neighbor == null) {
+                            DevourerNode newNeighbor = new DevourerNode(x, y, newDist);
+                            node.addNeighbor(newNeighbor);
+                            q.add(newNeighbor);
+                            map.put(index, newNeighbor);
+                        } else {
                         /*
                         if (neighbor.dist > newDist) { // ?????
                             neighbor.dist = newDist;
                         }
                          */
-                        node.neighbors.add(neighbor);
+                            node.addNeighbor(neighbor);
+                        }
                     }
                 }
             }
@@ -108,7 +111,7 @@ public class DevourerStructure {
         dist--;
 
         while (dist > -1) {
-            for (DevourerNode neighbor : node.neighbors) {
+            for (DevourerNode neighbor : node.getNeighbors()) {
                 if (neighbor.dist == dist) {
                     node = neighbor;
                     Position position = new Position();
@@ -137,7 +140,7 @@ public class DevourerStructure {
             position.y = y;
         } else if (node.dist > 0) {
             dist--;
-            for (DevourerNode neighbor : node.neighbors) {
+            for (DevourerNode neighbor : node.getNeighbors()) {
                 if (neighbor.dist == dist) {
                     position.x = neighbor.x;
                     position.y = neighbor.y;
@@ -151,7 +154,7 @@ public class DevourerStructure {
     }
 
 
-    public void addEntityNode(int x, int y, TileMap tileMap) {
+    public void addDevourerNode(int x, int y, TileMap tileMap) {
         ArrayList<DevourerNode> near = new ArrayList<>();
         int indX, indY;
         int maxDist = 0;
@@ -165,8 +168,7 @@ public class DevourerStructure {
             }
 
             DevourerNode node = getDevourerNode(indX, indY);
-            Entity entity = tileMap.getTile(indX, indY).getEntity();
-            if ((entity != null) && (node == null)) {
+            if ((tileMap.getTile(indX, indY).getEntity() != null) && (node == null)) { // if connect with a separate devourer area
                 createStructure(tileMap);
                 return;
             }
@@ -186,8 +188,8 @@ public class DevourerStructure {
                 DevourerNode newNode = new DevourerNode(x, y, newDist);
                 map.put(getIndex(x, y), newNode);
                 for (DevourerNode neighbor : near) {
-                    newNode.neighbors.add(neighbor);
-                    neighbor.neighbors.add(newNode);
+                    newNode.addNeighbor(neighbor);
+                    neighbor.addNeighbor(newNode);
                 }
             } else {
                 createStructure(tileMap);
@@ -195,9 +197,41 @@ public class DevourerStructure {
         }
     }
 
-    public boolean removeDevourerNode(int x, int y) {
-        //TODO implement
-        return false;
+    public void removeDevourerNode(int x, int y, TileMap tileMap) {
+        ArrayList<DevourerNode> near = new ArrayList<>();
+        int indX, indY;
+        int maxDist = 0;
+        int minDist = Integer.MAX_VALUE;
+        DevourerNode node;
+        for (int k = 0; k < 6; k++) {
+            indX = x + NEIGHBOR_DX[k];
+            if (x % 2 == 0) {
+                indY = y + NEIGHBOR_EVEN_X_DY[k];
+            } else {
+                indY = y + NEIGHBOR_ODD_X_DY[k];
+            }
+
+            node = getDevourerNode(indX, indY);
+
+            if (node != null) {
+                near.add(node);
+                if (node.dist > maxDist) {
+                    maxDist = node.dist;
+                }
+                if (node.dist < minDist) {
+                    minDist = node.dist;
+                }
+            }
+        }
+        node = getDevourerNode(x, y);
+        map.remove(getIndex(x, y), node);
+        if ((maxDist == minDist) && (maxDist <= node.dist)) {
+            for (DevourerNode neighbor : near) {
+                neighbor.removeNeighbor(node);
+            }
+        } else {
+            createStructure(tileMap);
+        }
     }
 
 }

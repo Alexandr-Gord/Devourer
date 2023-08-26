@@ -1,6 +1,7 @@
 package com.example.opengl;
 
 import com.example.opengl.devourer.DevourerNode;
+import com.example.opengl.devourer.DevourerStructure;
 
 import java.util.List;
 import java.util.Timer;
@@ -37,7 +38,7 @@ public class ResourceDepository {
         return dispatchPeriod;
     }
 
-    public void startResourceMining(DevourerNode startDevourerNode, Position startPosition, List<Resource> movingResources) {
+    public void startResourceMining(int indX, int indY, DevourerStructure devourerStructure, Position startPosition, List<Resource> movingResources) {
         if (getSize() > 0) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -47,7 +48,7 @@ public class ResourceDepository {
                         timer.cancel();
                         return;
                     }
-                    resource.startResource(startDevourerNode, startPosition);
+                    resource.startResource(new PositionInd(indX, indY), startPosition, devourerStructure);
                     movingResources.add(resource);
                 }
             }, 0, dispatchPeriod);
