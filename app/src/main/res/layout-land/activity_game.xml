@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".GameActivity">
 
-<com.example.opengl.GameView
+<com.example.opengl.GameView3D
     android:id="@+id/myGLSurfaceView"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />

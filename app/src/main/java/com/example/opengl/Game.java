@@ -6,26 +6,27 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
 
 import com.example.opengl.devourer.Devourer;
 import com.example.opengl.devourer.DevourerNode;
-import com.example.opengl.tiles.Mineral;
+import com.example.opengl.tiles.MineralType;
 import com.example.opengl.tiles.TileMap;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Game {
+public class Game extends BaseObservable {
     private static final Game instance = new Game();
     public GameActivity gameActivity;
-    public GameView gameView;
+    public GameView3D gameView3D;
     public TileMap tileMap;
     public int tileMapWidth = 35;
     public int tileMapHeight = 25;
@@ -33,6 +34,9 @@ public class Game {
     public Mode mode = Mode.VIEW;
     public boolean isShowMessage = false;
     Timer mineralTimer = new Timer();
+
+    public String message1 = null;
+    public String message2 = null;
 
     public enum Mode {
         BUILD, VIEW, DELETE
@@ -55,7 +59,7 @@ public class Game {
                 gameActivity.getResources().openRawResource(R.raw.basis_map),
                 gameActivity.getResources().openRawResource(R.raw.mineral_map),
                 gameActivity.getResources().openRawResource(R.raw.entity_map));
-        devourer = new Devourer(tileMap, gameView.betweenTileCentersX, gameView.betweenTileCentersY);
+        devourer = new Devourer(tileMap, gameView3D.betweenTileCentersX, gameView3D.betweenTileCentersY);
 
         Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -79,6 +83,46 @@ public class Game {
         }
     }
 
+    @Bindable
+    public String getMessage1() {
+        return message1;
+    }
+
+    public void setMessage1(String message) {
+        message1 = message;
+        notifyPropertyChanged(BR.message1);
+    }
+    @Bindable
+    public String getMessage2() {
+        return message2;
+    }
+
+    public void setMessage2(String message) {
+        message2 = message;
+        notifyPropertyChanged(BR.message2);
+    }
+
+    @Bindable
+    public String getCountMineral0() {
+        return devourer != null? String.valueOf(devourer.getMineralCount(MineralType.CRYSTAL)) : "0";
+    }
+
+    @Bindable
+    public String getCountMineral1() {
+        return devourer != null? String.valueOf(devourer.getMineralCount(MineralType.DIAMOND)) : "0";
+    }
+
+    @Bindable
+    public String getCountMineral2() {
+        return devourer != null? String.valueOf(devourer.getMineralCount(MineralType.GOLD)) : "0";
+    }
+    public void showMineralsCounts() {
+        notifyPropertyChanged(BR.countMineral0);
+        notifyPropertyChanged(BR.countMineral1);
+        notifyPropertyChanged(BR.countMineral2);
+    }
+
+    /*
     public void showMessage(String s) {
         TextView textView = gameActivity.findViewById(R.id.textView);
         if (isShowMessage) {
@@ -112,7 +156,7 @@ public class Game {
             });
         }
     }
-
+     */
 
     @Nullable
     public static Properties getMapProperties(int mapPropertiesId, @NonNull Context context) {
@@ -173,12 +217,12 @@ public class Game {
     }
 
     public void redraw() {
-        gameView.queueEvent(new Runnable() {
+        gameView3D.queueEvent(new Runnable() {
             // This method will be called on the rendering
             // thread:
             public void run() {
-                gameView.openGLRenderer.prepareTileData(createRenderDataTile());
-                gameView.openGLRenderer.prepareMovingData(devourer.createRenderDataMoving());
+                gameView3D.openGLRenderer.prepareTileData(createRenderDataTile());
+                gameView3D.openGLRenderer.prepareMovingData(devourer.createRenderDataMoving());
             }
         });
     }
@@ -191,7 +235,8 @@ public class Game {
         if (node != null) {
             dist = node.dist;
         }
-        showMessage("indX:" + indX + " indY:" + indY + " dist:" + dist);
+        //showMessage("indX:" + indX + " indY:" + indY + " dist:" + dist);
+        setMessage1("indX:" + indX + " indY:" + indY + " dist:" + dist);
         redraw();
     }
 
@@ -206,3 +251,6 @@ public class Game {
 
 // https://evileg.com/ru/post/359/#header_%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%BA%D0%BE%D0%B4%D0%B0:
 // https://www.techiedelight.com/lee-algorithm-shortest-path-in-a-maze/
+
+// Android Data Binding
+// https://startandroid.ru/ru/courses/architecture-components/27-course/architecture-components/551-urok-18-data-binding-osnovy.html

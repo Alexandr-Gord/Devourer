@@ -25,14 +25,22 @@ vec2 CorrectTexCoords(vec2 texCoords, float scale) {
 void main()
 {
     int number = int(aTextureNumber);
-    if (number == 0) {
-        TexCoords = CorrectTexCoords(aTexCoords, 0.98) * vec2(1.0, 1.0 / tileCountTexture0) + vec2(0.0, aTileNumber / tileCountTexture0);
-    } else if (number == 1) {
-        TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture1) + vec2(0.0, aTileNumber / tileCountTexture1);
-    } else if (number == 2) {
-        TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture2) + vec2(0.0, aTileNumber / tileCountTexture2);
-    } else if (number == 3) {
-        TexCoords = CorrectTexCoords(aTexCoords, 0.99) * vec2(1.0, 1.0 / tileCountTexture3) + vec2(0.0, aTileNumber / tileCountTexture3);
+    if (number == 0) { // base
+        //TexCoords = CorrectTexCoords(aTexCoords, 0.98) * vec2(1.0, 1.0 / tileCountTexture0) + vec2(0.0, aTileNumber / tileCountTexture0);
+        TexCoords = CorrectTexCoords(aTexCoords, 0.98);
+        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture0;
+    } else if (number == 1) { // mineral
+        //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture1) + vec2(0.0, aTileNumber / tileCountTexture1);
+        TexCoords = aTexCoords;
+        TexCoords.y = (1.0 - TexCoords.y + aTileNumber) / tileCountTexture1;
+    } else if (number == 2) { // devourer
+        //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture2) + vec2(0.0, aTileNumber / tileCountTexture2);
+        TexCoords = aTexCoords;
+        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture2;
+    } else if (number == 3) { // fog
+        //TexCoords = CorrectTexCoords(aTexCoords, 0.99) * vec2(1.0, 1.0 / tileCountTexture3) + vec2(0.0, aTileNumber / tileCountTexture3);
+        TexCoords = CorrectTexCoords(aTexCoords, 0.99);
+        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture3;
     }
 
     float offsetY = 0.0;

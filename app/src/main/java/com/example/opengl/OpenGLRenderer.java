@@ -154,7 +154,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         GL.ActiveTexture(TextureUnit.Texture0);
         */
 
-        Game.getInstance().showMessage2("transX:" + translateX + " transY:" + translateY + " scale:" + currentScale);
+        Game.getInstance().setMessage2("transX:" + translateX + " transY:" + translateY + " scale:" + currentScale);
 
         glBindVertexArray(vertexArrayObjectTile);
 

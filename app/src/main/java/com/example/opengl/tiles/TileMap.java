@@ -47,7 +47,7 @@ public class TileMap {
     }
 
     public Tile getTile(int x, int y) {
-        return tileList.get(getTileIndex(x, y));
+        return isTileExist(x, y) ? tileList.get(getTileIndex(x, y)) : null;
     }
 
     public void setTile(Tile tile, int x, int y) {

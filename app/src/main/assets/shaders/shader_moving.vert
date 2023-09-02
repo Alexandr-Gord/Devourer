@@ -12,7 +12,9 @@ varying vec2 TexCoords;
 
 void main()
 {
-    TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture) + vec2(0.0, aTileNumber / tileCountTexture);
+    TexCoords = aTexCoords;
+    TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture;
+    //TexCoords.y = (1.0 - TexCoords.y - aTileNumber) / tileCountTexture;
     vec2 offset = vec2(aTileX, aTileY);
     gl_Position = projection * model * vec4(aPos + offset, 0.0, 1.0);
 }

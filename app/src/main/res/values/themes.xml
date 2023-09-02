@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.OpenGL" parent="Base.Theme.OpenGL" />
+    <style name="GameMenuTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:itemBackground">@color/skyBlue</item>
+    </style>
 </resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/grp1"
+        android:checkableBehavior="single">
+        <item android:title="Orientation" />
+        <item
+            android:id="@+id/game_menu_orientation_auto"
+            android:icon="@drawable/mobile_phone_orientation"
+            android:title="Auto" />
+        <item
+            android:id="@+id/game_menu_orientation_horizontal"
+            android:icon="@drawable/mobile_phone_orientation"
+            android:title="Horizontal" />
+        <item
+            android:id="@+id/game_menu_orientation_vertical"
+            android:icon="@drawable/mobile_phone_orientation"
+            android:title="Vertical" />
+    </group>
+    <group android:id="@+id/grp2">
+        <item
+            android:id="@+id/game_menu_exit"
+            android:icon="@drawable/ic_exit"
+            android:title="Exit" />
+    </group>
+</menu>

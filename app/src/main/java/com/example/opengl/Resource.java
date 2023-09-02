@@ -58,7 +58,7 @@ public class Resource {
         }
         float distanceOverflow = delta + distance - 1f;
         if (distanceOverflow > 0) { // move to the next tile
-            if (nextDevourerNode.dist == 0) {
+            if (nextDevourerNode.dist == 0) { // Delivered to main devourer
                 distance = 1f;
                 isMoving = false;
                 isDelivered = true;

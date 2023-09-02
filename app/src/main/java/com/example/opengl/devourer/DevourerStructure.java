@@ -168,7 +168,7 @@ public class DevourerStructure {
             }
 
             DevourerNode node = getDevourerNode(indX, indY);
-            if ((tileMap.getTile(indX, indY).getEntity() != null) && (node == null)) { // if connect with a separate devourer area
+            if ((tileMap.getTile(indX, indY) != null) && (tileMap.getTile(indX, indY).getEntity() != null) && (node == null)) { // if connect with a separate devourer area
                 createStructure(tileMap);
                 return;
             }

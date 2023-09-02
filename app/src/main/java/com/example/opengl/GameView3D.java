@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-public class GameView extends GLSurfaceView {
+public class GameView3D extends GLSurfaceView {
     static final int NONE = 0;
     static final int DRAG = 1;
     static final int ZOOM = 2;
@@ -32,7 +32,7 @@ public class GameView extends GLSurfaceView {
     private float leftTranslateBound, rightTranslateBound, topTranslateBound, bottomTranslateBound;
     public boolean testMode = false;
 
-    public GameView(Context context, AttributeSet attrs) {
+    public GameView3D(Context context, AttributeSet attrs) {
         super(context, attrs);
         setEGLContextClientVersion(3); // OpenGL ES version 3.0
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
@@ -85,7 +85,7 @@ public class GameView extends GLSurfaceView {
                         translateY -= deltaY;
                         fixTranslate();
 
-                        Game.getInstance().showMessage("maxTransX:" + Game.getInstance().tileMapHeight);
+                        Game.getInstance().setMessage1("maxTransX:" + Game.getInstance().tileMapHeight);
 
                         queueEvent(new Runnable() {
                             // This method will be called on the rendering
@@ -175,7 +175,7 @@ public class GameView extends GLSurfaceView {
                 calculateTranslateBounds();
                 fixTranslate();
 
-                Game.getInstance().showMessage("focusX:" + detector.getFocusX() + " focusY:" + detector.getFocusY());
+                Game.getInstance().setMessage1("focusX:" + detector.getFocusX() + " focusY:" + detector.getFocusY());
 
                 //translateY = translateY * ( -mScaleFactor) - detector.getFocusY() * (1 - mScaleFactor);
                 //bitmapTransY = -transMatrix[Matrix.MTRANS_Y] * mScaleFactor - detector.getFocusY() * (1 - mScaleFactor);
