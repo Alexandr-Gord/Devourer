@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
         if (!supportES3()) {
             Toast.makeText(this, "OpenGl ES 3.0 is not supported", Toast.LENGTH_LONG).show();
             finish();
@@ -28,6 +27,13 @@ public class MainActivity extends AppCompatActivity {
     public void startGame(View view) {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
+    }
+
+    public void exitGame(View view) {
+        finishAndRemoveTask();
+        //moveTaskToBack(true);
+        //android.os.Process.killProcess(android.os.Process.myPid());
+        //System.exit(1);
     }
 
     @Override

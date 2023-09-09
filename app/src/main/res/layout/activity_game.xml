@@ -53,16 +53,6 @@
                 android:text="@={viewModel.message2}"
                 android:textColor="@color/white" />
 
-            <android.widget.Button
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="35dp"
-                android:background="@drawable/button" />
-
             <com.example.opengl.SelectButton
                 android:id="@+id/buttonSelect"
                 android:layout_width="140dp"
@@ -84,7 +74,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="0dp"
-                android:layout_toStartOf="@+id/buttonOrientation"
+                android:layout_toStartOf="@+id/buttonMenu"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -142,7 +132,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
-                android:background="@drawable/menubtn" />
+                android:background="@drawable/menu_btn" />
         </RelativeLayout>
 
         <com.google.android.material.navigation.NavigationView
@@ -151,13 +141,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_gravity="end"
-            android:theme="@style/GameMenuTheme"
+            android:background="@color/colorMenuBackground"
             android:fitsSystemWindows="false"
-            app:itemIconTint="#cd4312"
+            app:itemIconTint="#8BC34A"
             app:itemTextAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:itemTextColor="#1d3f4c"
-            app:menu="@menu/navigation_game_menu" />
+            app:itemTextColor="#4B8FAA"
+            app:menu="@menu/navigation_game_menu"
+            app:subheaderColor="#2196F3"
+            app:subheaderTextAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
-    
+
 </layout>

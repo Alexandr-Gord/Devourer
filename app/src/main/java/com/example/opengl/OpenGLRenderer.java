@@ -166,14 +166,16 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
 
         shaderTile.setMatrix4("projection", mProjectionMatrix);
         shaderTile.setMatrix4("model", mModelMatrix);
-        shaderTile.setFloat("tileCountTexture0", textureBasis.tilesCount);
-        shaderTile.setFloat("tileCountTexture1", textureMineral.tilesCount);
-        shaderTile.setFloat("tileCountTexture2", textureEntity.tilesCount);
-        shaderTile.setFloat("tileCountTexture3", textureFog.tilesCount);
-        shaderTile.setInt("u_texture0", 0);
-        shaderTile.setInt("u_texture1", 1);
-        shaderTile.setInt("u_texture2", 2);
-        shaderTile.setInt("u_texture3", 3);
+        float[] tileCounts = new float[4];
+        tileCounts[0] = textureBasis.tilesCount;
+        tileCounts[1] = textureMineral.tilesCount;
+        tileCounts[2] = textureEntity.tilesCount;
+        tileCounts[3] = textureFog.tilesCount;
+        shaderTile.setFloatArray("tileCountTexture[0]", tileCounts);
+
+        int[] textures = new int[]{0, 1, 2, 3};
+        shaderTile.setIntArray("u_texture[0]", textures);
+
         textureBasis.Use(GL_TEXTURE0);
         textureMineral.Use(GL_TEXTURE0 + 1);
         textureEntity.Use(GL_TEXTURE0 + 2);

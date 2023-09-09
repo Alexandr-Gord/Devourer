@@ -2,7 +2,6 @@ package com.example.opengl;
 
 import android.content.Context;
 import android.os.Handler;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,8 +31,8 @@ public class Game extends BaseObservable {
     public int tileMapHeight = 25;
     public Devourer devourer;
     public Mode mode = Mode.VIEW;
-    public boolean isShowMessage = false;
-    Timer mineralTimer = new Timer();
+    private boolean isShowMessage = false;
+    private Timer mineralTimer;
 
     public String message1 = null;
     public String message2 = null;
@@ -62,6 +61,8 @@ public class Game extends BaseObservable {
         devourer = new Devourer(tileMap, gameView3D.betweenTileCentersX, gameView3D.betweenTileCentersY);
 
         Handler handler = new Handler();
+        mineralTimer = new Timer();
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -89,74 +90,54 @@ public class Game extends BaseObservable {
     }
 
     public void setMessage1(String message) {
-        message1 = message;
-        notifyPropertyChanged(BR.message1);
+        if (isShowMessage) {
+            message1 = message;
+            notifyPropertyChanged(BR.message1);
+        }
     }
+
     @Bindable
     public String getMessage2() {
         return message2;
     }
 
     public void setMessage2(String message) {
-        message2 = message;
-        notifyPropertyChanged(BR.message2);
+        if (isShowMessage) {
+            message2 = message;
+            notifyPropertyChanged(BR.message2);
+        }
+    }
+
+    public void setShowMessage(boolean showMessage) {
+        isShowMessage = showMessage;
+        if (!showMessage) {
+            message1 = "";
+            message2 = "";
+            notifyPropertyChanged(BR.message1);
+            notifyPropertyChanged(BR.message2);
+        }
     }
 
     @Bindable
     public String getCountMineral0() {
-        return devourer != null? String.valueOf(devourer.getMineralCount(MineralType.CRYSTAL)) : "0";
+        return devourer != null ? String.valueOf(devourer.getMineralCount(MineralType.CRYSTAL)) : "0";
     }
 
     @Bindable
     public String getCountMineral1() {
-        return devourer != null? String.valueOf(devourer.getMineralCount(MineralType.DIAMOND)) : "0";
+        return devourer != null ? String.valueOf(devourer.getMineralCount(MineralType.DIAMOND)) : "0";
     }
 
     @Bindable
     public String getCountMineral2() {
-        return devourer != null? String.valueOf(devourer.getMineralCount(MineralType.GOLD)) : "0";
+        return devourer != null ? String.valueOf(devourer.getMineralCount(MineralType.GOLD)) : "0";
     }
+
     public void showMineralsCounts() {
         notifyPropertyChanged(BR.countMineral0);
         notifyPropertyChanged(BR.countMineral1);
         notifyPropertyChanged(BR.countMineral2);
     }
-
-    /*
-    public void showMessage(String s) {
-        TextView textView = gameActivity.findViewById(R.id.textView);
-        if (isShowMessage) {
-            textView.post(new Runnable() {
-                public void run() {
-                    textView.setText(s);
-                }
-            });
-        } else {
-            textView.post(new Runnable() {
-                public void run() {
-                    textView.setText("");
-                }
-            });
-        }
-    }
-
-    public void showMessage2(String s) {
-        TextView textView = gameActivity.findViewById(R.id.textView2);
-        if (isShowMessage) {
-            textView.post(new Runnable() {
-                public void run() {
-                    textView.setText(s);
-                }
-            });
-        } else {
-            textView.post(new Runnable() {
-                public void run() {
-                    textView.setText("");
-                }
-            });
-        }
-    }
-     */
 
     @Nullable
     public static Properties getMapProperties(int mapPropertiesId, @NonNull Context context) {
@@ -168,21 +149,6 @@ public class Game extends BaseObservable {
             return properties;
         } catch (IOException e) {
             return null;
-        }
-    }
-
-    public void onButtonPress() {
-        isShowMessage = !isShowMessage;
-        if (!isShowMessage) {
-            TextView textView = gameActivity.findViewById(R.id.textView);
-            textView.setText("");
-            textView = gameActivity.findViewById(R.id.textView2);
-            textView.setText("");
-        } else {
-            TextView textView = gameActivity.findViewById(R.id.textView);
-            textView.setText("Message on");
-            textView = gameActivity.findViewById(R.id.textView2);
-            textView.setText("Message on");
         }
     }
 

@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="skyBlue">#87CEEB</color>
+    <color name="colorAccent">#C81557</color>
+    <color name="skyBlue">#3898BF</color>
+    <color name="colorMenuBackground">#565C4C</color>
 </resources>

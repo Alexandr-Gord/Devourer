@@ -1,5 +1,7 @@
 package com.example.opengl;
 
+import static android.opengl.GLES20.glUniform1fv;
+import static android.opengl.GLES20.glUniform1iv;
 import static android.opengl.GLES30.GL_ACTIVE_ATTRIBUTES;
 import static android.opengl.GLES30.GL_ACTIVE_UNIFORMS;
 import static android.opengl.GLES30.GL_COMPILE_STATUS;
@@ -152,9 +154,19 @@ public class Shader {
         glUniform1i(getUniformLocation(name), data);
     }
 
+    public void setIntArray(String name, int[] data) {
+        glUseProgram(Handle);
+        glUniform1iv(getUniformLocation(name), data.length, data,0);
+    }
+
     public void setFloat(String name, float data) {
         glUseProgram(Handle);
         glUniform1f(getUniformLocation(name), data);
+    }
+
+    public void setFloatArray(String name, float[] data) {
+        glUseProgram(Handle);
+        glUniform1fv(getUniformLocation(name), data.length, data, 0);
     }
 
     public void setMatrix4(String name, float[] data) {

@@ -8,10 +8,7 @@ layout (location = 5) attribute float aTextureNumber;
 uniform mat4 model;
 uniform mat4 projection;
 //uniform float mapHeight;
-uniform float tileCountTexture0;
-uniform float tileCountTexture1;
-uniform float tileCountTexture2;
-uniform float tileCountTexture3;
+uniform float tileCountTexture[4];
 
 varying vec2 TexCoords;
 varying float TextureNumber;
@@ -26,21 +23,21 @@ void main()
 {
     int number = int(aTextureNumber);
     if (number == 0) { // base
-        //TexCoords = CorrectTexCoords(aTexCoords, 0.98) * vec2(1.0, 1.0 / tileCountTexture0) + vec2(0.0, aTileNumber / tileCountTexture0);
-        TexCoords = CorrectTexCoords(aTexCoords, 0.98);
-        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture0;
+                       //TexCoords = CorrectTexCoords(aTexCoords, 0.98) * vec2(1.0, 1.0 / tileCountTexture[0]) + vec2(0.0, aTileNumber / tileCountTexture[0]);
+                       TexCoords = CorrectTexCoords(aTexCoords, 0.98);
+                       TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[0];
     } else if (number == 1) { // mineral
-        //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture1) + vec2(0.0, aTileNumber / tileCountTexture1);
-        TexCoords = aTexCoords;
-        TexCoords.y = (1.0 - TexCoords.y + aTileNumber) / tileCountTexture1;
+                              //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture[1]) + vec2(0.0, aTileNumber / tileCountTexture[1]);
+                              TexCoords = aTexCoords;
+                              TexCoords.y = (1.0 - TexCoords.y + aTileNumber) / tileCountTexture[1];
     } else if (number == 2) { // devourer
-        //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture2) + vec2(0.0, aTileNumber / tileCountTexture2);
-        TexCoords = aTexCoords;
-        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture2;
+                              //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture[2]) + vec2(0.0, aTileNumber / tileCountTexture[2]);
+                              TexCoords = aTexCoords;
+                              TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[2];
     } else if (number == 3) { // fog
-        //TexCoords = CorrectTexCoords(aTexCoords, 0.99) * vec2(1.0, 1.0 / tileCountTexture3) + vec2(0.0, aTileNumber / tileCountTexture3);
-        TexCoords = CorrectTexCoords(aTexCoords, 0.99);
-        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture3;
+                              //TexCoords = CorrectTexCoords(aTexCoords, 0.99) * vec2(1.0, 1.0 / tileCountTexture[3]) + vec2(0.0, aTileNumber / tileCountTexture[3]);
+                              TexCoords = CorrectTexCoords(aTexCoords, 0.99);
+                              TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[3];
     }
 
     float offsetY = 0.0;

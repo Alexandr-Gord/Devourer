@@ -46,9 +46,9 @@ public class SelectButton extends androidx.appcompat.widget.AppCompatImageButton
         setState(FlashEnum.VIEW);
         setOnTouchListener(new TouchListener());
         images = new int[FlashEnum.values().length];
-        images[0] = R.drawable.addbtn;
-        images[1] = R.drawable.clickbtn;
-        images[2] = R.drawable.deletebtn;
+        images[0] = R.drawable.add_btn;
+        images[1] = R.drawable.click_btn;
+        images[2] = R.drawable.delete_btn;
         bitmaps = new Bitmap[images.length];
         for (int i = 0; i < images.length; i++) {
             bitmaps[i] = BitmapFactory.decodeResource(getResources(), images[i]);

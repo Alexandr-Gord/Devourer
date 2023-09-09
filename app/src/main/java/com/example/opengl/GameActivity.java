@@ -2,7 +2,6 @@ package com.example.opengl;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +20,8 @@ public class GameActivity extends AppCompatActivity {
     public GameView3D gameView3D;
     private DrawerLayout drawer;
     private NavigationView navigation;
+
+    private MenuItem selectedOrientation, selectedShowMessages;
 
     public void initialize() {
         Game.getInstance().gameActivity = this;
@@ -56,6 +57,10 @@ public class GameActivity extends AppCompatActivity {
         });
 
         navigation = (NavigationView) findViewById(R.id.navigationViewGameMenu);
+        selectedOrientation = (MenuItem) navigation.getMenu().findItem(R.id.game_menu_orientation_vertical);
+        selectedOrientation.setChecked(true);
+        selectedShowMessages = (MenuItem) navigation.getMenu().findItem(R.id.game_menu_hide_messages);
+        selectedShowMessages.setChecked(true);
         navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -66,27 +71,35 @@ public class GameActivity extends AppCompatActivity {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 } else if (itemId == R.id.game_menu_orientation_vertical){
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                } else if (itemId == R.id.game_menu_show_messages) {
+                    Game.getInstance().setShowMessage(true);
+                } else if (itemId == R.id.game_menu_hide_messages) {
+                    Game.getInstance().setShowMessage(false);
                 } else if (itemId == R.id.game_menu_exit) {
                     exitMainMenu();
+                }
+                if (item.getGroupId() == R.id.group_orientation) {
+                    if (selectedOrientation != null) {
+                        selectedOrientation.setChecked(false);
+                    }
+                    selectedOrientation = item;
+                    selectedOrientation.setChecked(true);
+                } else if (item.getGroupId() == R.id.group_show_messages) {
+                    if (selectedShowMessages != null) {
+                        selectedShowMessages.setChecked(false);
+                    }
+                    selectedShowMessages = item;
+                    selectedShowMessages.setChecked(true);
                 }
                 return true;
             }
         });
-
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Game.getInstance().onButtonPress();
-                gameView3D.runTest();
-            }
-        });
-
     }
 
     public void exitMainMenu() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        finishAndRemoveTask();
+        //Intent intent = new Intent(this, MainActivity.class);
+        //startActivity(intent);
     }
 
     @Override

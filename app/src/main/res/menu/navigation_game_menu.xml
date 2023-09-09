@@ -1,27 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group
-        android:id="@+id/grp1"
-        android:checkableBehavior="single">
-        <item android:title="Orientation" />
-        <item
-            android:id="@+id/game_menu_orientation_auto"
-            android:icon="@drawable/mobile_phone_orientation"
-            android:title="Auto" />
-        <item
-            android:id="@+id/game_menu_orientation_horizontal"
-            android:icon="@drawable/mobile_phone_orientation"
-            android:title="Horizontal" />
-        <item
-            android:id="@+id/game_menu_orientation_vertical"
-            android:icon="@drawable/mobile_phone_orientation"
-            android:title="Vertical" />
-    </group>
-    <group android:id="@+id/grp2">
+    <item
+        android:title="Orientation">
+        <menu>
+            <group android:id="@+id/group_orientation">
+                <item
+                    android:id="@+id/game_menu_orientation_auto"
+                    android:icon="@drawable/mobile_auto"
+                    android:checkable="true"
+                    android:title="Auto" />
+                <item
+                    android:id="@+id/game_menu_orientation_horizontal"
+                    android:icon="@drawable/mobile_horizontal"
+                    android:checkable="true"
+                    android:title="Horizontal" />
+                <item
+                    android:id="@+id/game_menu_orientation_vertical"
+                    android:icon="@drawable/mobile_vertical"
+                    android:checkable="true"
+                    android:title="Vertical"
+                    />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:title="Show messages">
+        <menu>
+            <group android:id="@+id/group_show_messages">
+                <item
+                    android:id="@+id/game_menu_show_messages"
+                    android:icon="@drawable/eye"
+                    android:title="Show"
+                    android:checkable="true"/>
+                <item
+                    android:id="@+id/game_menu_hide_messages"
+                    android:icon="@drawable/eye_slash"
+                    android:title="Hide"
+                    android:checkable="true" />
+            </group>
+        </menu>
+    </item>
+    <group android:id="@+id/group_exit">
         <item
             android:id="@+id/game_menu_exit"
             android:icon="@drawable/ic_exit"
-            android:title="Exit" />
+            android:title="Exit game" />
     </group>
+
 </menu>
