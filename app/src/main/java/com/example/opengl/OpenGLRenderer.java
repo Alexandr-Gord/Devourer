@@ -50,6 +50,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
     private Shader shaderTile;
     private Shader shaderMoving;
     private FloatBuffer vertexDataBuffer;
+    private FloatBuffer vertexUnitDataBuffer;
     private ShortBuffer tilesDataBuffer;
     private FloatBuffer movingDataBuffer;
     private Texture textureBasis;
@@ -57,6 +58,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
     private Texture textureEntity;
     private Texture textureFog;
     private Texture textureMoving;
+    private Texture textureMainDevourer;
     private int vertexArrayObjectTile;
     private int vertexArrayObjectMoving;
     private int vertexBufferObjectInstancedTile;
@@ -109,6 +111,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         this.textureEntity = Texture.Create(context, R.drawable.dev_texture, 64);
         this.textureFog = Texture.Create(context, R.drawable.fog_texture, 29);
         this.textureMoving = Texture.Create(context, R.drawable.moving_texture, 1);
+        this.textureMainDevourer = Texture.Create(context, R.drawable.main_texture, 23);
     }
 
     @Override
@@ -197,10 +200,18 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
 
         shaderMoving.setMatrix4("projection", mProjectionMatrix);
         shaderMoving.setMatrix4("model", mModelMatrix);
-        shaderMoving.setFloat("tileCountTexture", textureMoving.tilesCount);
-        shaderMoving.setInt("u_texture", 4);
+
+        float[] tileCounts = new float[2];
+        tileCounts[0] = textureMoving.tilesCount;
+        tileCounts[1] = textureMainDevourer.tilesCount;
+        shaderMoving.setFloatArray("tileCountTexture[0]", tileCounts);
+
+        int[] textures = new int[]{4, 5};
+        shaderMoving.setIntArray("u_texture[0]", textures);
+
         textureMoving.Use(GL_TEXTURE0 + 4);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, tilesDataBuffer.capacity() / 3);
+        textureMainDevourer.Use(GL_TEXTURE0 + 5);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, tilesDataBuffer.capacity() / 4);
         glBindVertexArray(0);
     }
 
@@ -239,6 +250,30 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         vertexDataBuffer = FloatBuffer.allocate(vertices.length);
         vertexDataBuffer.put(vertices);
         vertexDataBuffer.position(0);
+
+        float[] verticesUnit = {
+                // x y u v
+                0, 0, 0, 0,
+                1, 0, 1, 0,
+                0, 1, 0, 1,
+                1, 1, 1, 1,
+                0, 1, 0, 1,
+                1, 0, 1, 0
+        };
+/*
+        float[] verticesUnit = {
+                // x y u v
+                -0.5f, -0.5f, 0, 0,
+                0.5f, -0.5f, 1, 0,
+                -0.5f, 0.5f, 0, 1,
+                0.5f, 0.5f, 1, 1,
+                -0.5f, 0.5f, 0, 1,
+                0.5f, -0.5f, 1, 0
+        };
+ */
+        vertexUnitDataBuffer = FloatBuffer.allocate(verticesUnit.length);
+        vertexUnitDataBuffer.put(verticesUnit);
+        vertexUnitDataBuffer.position(0);
     }
 
     public void prepareTileData(ShortBuffer buffer) {
@@ -375,7 +410,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         int vertexBufferObjectMoving = ids[0];
         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjectMoving);
         vertexDataBuffer.position(0);
-        glBufferData(GL_ARRAY_BUFFER, vertexDataBuffer.capacity() * FLOAT_SIZE_BYTES, vertexDataBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertexUnitDataBuffer.capacity() * FLOAT_SIZE_BYTES, vertexUnitDataBuffer, GL_STATIC_DRAW);
 
         int vertexLocation = shaderMoving.getAttribLocation("aPos");
         glEnableVertexAttribArray(vertexLocation);
@@ -388,20 +423,25 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         glBindBuffer(GL_ARRAY_BUFFER, this.vertexBufferObjectInstancedMoving);
         int tilePositionX = shaderMoving.getAttribLocation("aTileX");
         glEnableVertexAttribArray(tilePositionX);
-        glVertexAttribPointer(tilePositionX, 1, GL_FLOAT, false, 3 * FLOAT_SIZE_BYTES, 0);
+        glVertexAttribPointer(tilePositionX, 1, GL_FLOAT, false, 4 * FLOAT_SIZE_BYTES, 0);
 
         int tilePositionY = shaderMoving.getAttribLocation("aTileY");
         glEnableVertexAttribArray(tilePositionY);
-        glVertexAttribPointer(tilePositionY, 1, GL_FLOAT, false, 3 * FLOAT_SIZE_BYTES, FLOAT_SIZE_BYTES);
+        glVertexAttribPointer(tilePositionY, 1, GL_FLOAT, false, 4 * FLOAT_SIZE_BYTES, FLOAT_SIZE_BYTES);
 
         int tileNumber = shaderMoving.getAttribLocation("aTileNumber");
         glEnableVertexAttribArray(tileNumber);
-        glVertexAttribPointer(tileNumber, 1, GL_FLOAT, false, 3 * FLOAT_SIZE_BYTES, 2 * FLOAT_SIZE_BYTES);
+        glVertexAttribPointer(tileNumber, 1, GL_FLOAT, false, 4 * FLOAT_SIZE_BYTES, 2 * FLOAT_SIZE_BYTES);
+
+        int textureNumber = shaderMoving.getAttribLocation("aTextureNumber");
+        glEnableVertexAttribArray(textureNumber);
+        glVertexAttribPointer(textureNumber, 1, GL_FLOAT, false, 4 * FLOAT_SIZE_BYTES, 3 * FLOAT_SIZE_BYTES);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glVertexAttribDivisor(tilePositionX, 1);
         glVertexAttribDivisor(tilePositionY, 1);
         glVertexAttribDivisor(tileNumber, 1);
+        glVertexAttribDivisor(textureNumber, 1);
 
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);

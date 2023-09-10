@@ -61,6 +61,9 @@ public class Game extends BaseObservable {
         devourer = new Devourer(tileMap, gameView3D.betweenTileCentersX, gameView3D.betweenTileCentersY);
 
         Handler handler = new Handler();
+        if (mineralTimer != null) {
+            mineralTimer.cancel();
+        }
         mineralTimer = new Timer();
 
         Runnable runnable = new Runnable() {
@@ -75,7 +78,7 @@ public class Game extends BaseObservable {
             }
         };
         handler.postDelayed(runnable, 1000);
-
+        setShowMessage(false);
     }
 
     private void mineralTimerTick() {

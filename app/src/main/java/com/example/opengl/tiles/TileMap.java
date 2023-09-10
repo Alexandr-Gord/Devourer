@@ -21,8 +21,8 @@ public class TileMap {
     private final Properties mapProperties;
     private int lastSelectedTileIndX = -1;
     private int lastSelectedTileIndY = -1;
-    private int mainEntityTileIndX = -1;
-    private int mainEntityTileIndY = -1;
+    private int mainDevourerTileIndX = -1;
+    private int mainDevourerTileIndY = -1;
     private static final String DELIMITER_MAP = " ";
     private static final String DELIMITER_PROPERTY = ",";
     private static final int[] FOG_TILE_CODE = new int[]{
@@ -74,17 +74,17 @@ public class TileMap {
         this.lastSelectedTileIndY = lastSelectedTileIndY;
     }
 
-    public int getMainEntityTileIndX() {
-        return mainEntityTileIndX;
+    public int getMainDevourerTileIndX() {
+        return mainDevourerTileIndX;
     }
 
-    public int getMainEntityTileIndY() {
-        return mainEntityTileIndY;
+    public int getMainDevourerTileIndY() {
+        return mainDevourerTileIndY;
     }
 
-    private void findMainEntityTilePos() {
-        mainEntityTileIndX = 7; // del
-        mainEntityTileIndY = 16; // del
+    private void findMainDevourerTilePos() {
+        mainDevourerTileIndX = 7; // del
+        mainDevourerTileIndY = 16; // del
         //TODO implement
     }
 
@@ -105,7 +105,7 @@ public class TileMap {
             // todo log exception
         }
         fixSprites();
-        findMainEntityTilePos();
+        findMainDevourerTilePos();
         generateFogMap();
     }
 

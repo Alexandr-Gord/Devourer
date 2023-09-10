@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.example.opengl.Position;
 import com.example.opengl.PositionInd;
-import com.example.opengl.tiles.Entity;
 import com.example.opengl.tiles.TileMap;
 
 import java.util.ArrayDeque;
@@ -47,7 +46,7 @@ public class DevourerStructure {
 
     public void createStructure(@NonNull TileMap tileMap) {
         synchronized (map) {
-            this.main = new DevourerNode(tileMap.getMainEntityTileIndX(), tileMap.getMainEntityTileIndY(), 0);
+            this.main = new DevourerNode(tileMap.getMainDevourerTileIndX(), tileMap.getMainDevourerTileIndY(), 0);
             map.clear();
             map.put(getIndex(main.x, main.y), main);
 

@@ -23,6 +23,7 @@ public class Devourer {
     private final DevourerStructure devourerStructure;
     private final List<Resource> movingResources = Collections.synchronizedList(new ArrayList<>());
     private final ResourcesStorage resourcesStorage = new ResourcesStorage();
+    private final Position mainDevourerPos;
     private final float betweenTileCentersX;
     private final float betweenTileCentersY;
 
@@ -32,6 +33,8 @@ public class Devourer {
         this.betweenTileCentersY = betweenTileCentersY;
         this.devourerStructure = new DevourerStructure();
         devourerStructure.createStructure(tileMap);
+        PositionInd mainDevourerPosInd = new PositionInd(tileMap.getMainDevourerTileIndX(), tileMap.getMainDevourerTileIndY());
+        mainDevourerPos = calculateDevourerNodePosition(mainDevourerPosInd);
     }
 
     public DevourerNode getDevourerNode(int x, int y) {
@@ -95,9 +98,16 @@ public class Devourer {
                     resourcesData.add(position.x);
                     resourcesData.add(position.y);
                     resourcesData.add(0f); // tile number
+                    resourcesData.add(0f); // texture number
                 }
             }
-            if (resourcesData.size() == 0) return null;
+
+            resourcesData.add(mainDevourerPos.x);
+            resourcesData.add(mainDevourerPos.y);
+            resourcesData.add(0f); // tile number
+            resourcesData.add(1f); // texture number main devourer
+
+            //if (resourcesData.size() == 0) return null;
             FloatBuffer result = FloatBuffer.allocate(resourcesData.size());
             for (float fl : resourcesData) {
                 result.put(fl);
