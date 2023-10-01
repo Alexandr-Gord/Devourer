@@ -105,6 +105,21 @@ class Shader(context: Context, vertexShaderFilename: String, fragmentShaderFilen
         GLES20.glUniform3fv(getUniformLocation(name), 1, data, 0)
     }
 
+    fun setVector3(name: String, x: Float, y: Float, z: Float) {
+        GLES20.glUseProgram(handle)
+        GLES20.glUniform3f(getUniformLocation(name), x, y, z)
+    }
+
+    fun setVector2(name: String, data: FloatArray?) {
+        GLES20.glUseProgram(handle)
+        GLES20.glUniform2fv(getUniformLocation(name), 1, data, 0)
+    }
+
+    fun setVector2(name: String, x: Float, y: Float) {
+        GLES20.glUseProgram(handle)
+        GLES20.glUniform2f(getUniformLocation(name), x, y)
+    }
+
     companion object {
         private fun compileShader(context: Context, shader: Int) {
             GLES20.glCompileShader(shader)

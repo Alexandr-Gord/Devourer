@@ -3,13 +3,9 @@ package com.example.opengl
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLES30
-import android.opengl.Matrix
 import java.io.IOException
 import java.nio.FloatBuffer
-import java.nio.ShortBuffer
 import java.util.concurrent.locks.ReentrantLock
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
 class RenderFreeObjects (private val context: Context) {
     private val lockMoving = ReentrantLock()
@@ -29,8 +25,8 @@ class RenderFreeObjects (private val context: Context) {
         } catch (e: IOException) {
             null
         }
-        textureMoving = Texture.Create(context, R.drawable.moving_texture, 1)
-        textureMainDevourer = Texture.Create(context, R.drawable.main_texture, 23)
+        textureMoving = Texture.create(context, R.drawable.moving_texture, 1)
+        textureMainDevourer = Texture.create(context, R.drawable.main_texture, 23)
     }
 
 
@@ -57,9 +53,9 @@ class RenderFreeObjects (private val context: Context) {
         shaderMoving!!.setFloatArray("tileCountTexture[0]", tileCounts)
         val textures = intArrayOf(4, 5)
         shaderMoving!!.setIntArray("u_texture[0]", textures)
-        textureMoving!!.Use(GLES20.GL_TEXTURE0 + 4)
-        textureMainDevourer!!.Use(GLES20.GL_TEXTURE0 + 5)
-        GLES30.glDrawArraysInstanced(GLES20.GL_TRIANGLES, 0, 6, movingDataBuffer!!.capacity() / 4) // was tilesDataBuffer ???
+        textureMoving!!.use(GLES20.GL_TEXTURE0 + 4)
+        textureMainDevourer!!.use(GLES20.GL_TEXTURE0 + 5)
+        GLES30.glDrawArraysInstanced(GLES20.GL_TRIANGLES, 0, 6, movingDataBuffer!!.capacity() / 4)
         GLES30.glBindVertexArray(0)
     }
 

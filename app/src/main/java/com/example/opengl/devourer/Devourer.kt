@@ -61,12 +61,12 @@ class Devourer(
 
     private val currentAnimationSpriteNumber: Float
         get() {
-            var result = 0
+            var result = 0f
             result = when (devourerState) {
                 DevourerState.NORMAL -> NORMAL_PHASES[animationPhase]
                 DevourerState.EATING -> EATING_PHASES[animationPhase]
-            }
-            return result.toFloat()
+            }.toFloat()
+            return result
         }
 
     private fun setDevourerState(newDevourerState: DevourerState) {

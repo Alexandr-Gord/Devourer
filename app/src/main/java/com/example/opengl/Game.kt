@@ -1,8 +1,8 @@
 package com.example.opengl
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.core.content.ContextCompat
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import com.example.opengl.devourer.Devourer
@@ -61,24 +61,37 @@ class Game private constructor() : BaseObservable() {
             Devourer(tileMap!!, gameView3D!!.betweenTileCentersX, gameView3D!!.betweenTileCentersY)
         mineralTimer?.cancel()
         mineralTimer = Timer()
-        //val handler = Handler()
         val runnable = Runnable {
-            redraw()
-            mineralTimer!!.schedule(object : TimerTask() {
-                override fun run() {
-                    mineralTimerTick()
-                }
-            }, 0, 33)
+            initWithDelay()
         }
         gameView3D!!.postDelayed(runnable, 1000) // TODO remake
         setShowMessage(false)
+    }
+
+    private fun initWithDelay() {
+        redraw()
+        mineralTimer!!.schedule(object : TimerTask() {
+            override fun run() {
+                mineralTimerTick()
+            }
+        }, 0, 33)
 
         val fontData: FontData =
-            FontData(context = gameView3D!!.context, fontFilename = "", size = 10.0f)
+            FontData(context = gameView3D!!.context, fontFilename = "", size = 50.0f)
         FontDataStorage.setDefaultFontData(fontData)
+        val fontPixel: FontData =
+            FontData(context = gameView3D!!.context, fontFilename = "fonts/advanced_pixel-7.ttf", size = 80.0f)
+        FontDataStorage.addFontData("pixel", fontPixel)
         //val myColor: Int = R.color.white
-        val text1 = Text2D("Welcome", FontDataStorage.getFontData(""), 0f, 0f, 1f, Color.RED)
+        val text1 = Text2D("Welcome", FontDataStorage.getFontData(""), 100f, 600f, 2f, Color.RED)
         TextStorage.addText2D("greetings", text1)
+        val text2 = Text2D("Username", FontDataStorage.getFontData("pixel"), 100f, 500f, 1.5f, Color.YELLOW)
+        TextStorage.addText2D("user", text2)
+        val bitmap : Bitmap = FontDataStorage.createFontsBitmap();
+        gameView3D!!.queueEvent {
+            gameView3D!!.openGLRenderer.renderText?.initTexture(bitmap)
+            bitmap.recycle()
+        }
     }
 
     private fun mineralTimerTick() {
@@ -175,6 +188,7 @@ class Game private constructor() : BaseObservable() {
         gameView3D!!.queueEvent {
             gameView3D!!.openGLRenderer.renderTileObjects?.prepareTileData(createRenderDataTile())
             gameView3D!!.openGLRenderer.renderFreeObjects?.prepareMovingData(devourer!!.createRenderDataMoving())
+            gameView3D!!.openGLRenderer.renderText?.prepareTextData(TextStorage.createRenderDataText())
         }
     }
 
