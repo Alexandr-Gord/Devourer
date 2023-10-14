@@ -28,10 +28,10 @@ class RenderTileObjects(private val context: Context) {
         } catch (e: IOException) {
             null
         }
-        textureBasis = Texture.Create(context, R.drawable.base_texture, 2)
-        textureMineral = Texture.Create(context, R.drawable.mineral_texture, 3)
-        textureEntity = Texture.Create(context, R.drawable.dev_texture, 64)
-        textureFog = Texture.Create(context, R.drawable.fog_texture, 29)
+        textureBasis = Texture.create(context, R.drawable.base_texture, 2)
+        textureMineral = Texture.create(context, R.drawable.mineral_texture, 3)
+        textureEntity = Texture.create(context, R.drawable.dev_texture, 64)
+        textureFog = Texture.create(context, R.drawable.fog_texture, 29)
     }
 
     fun draw(projectionMatrix: FloatArray, modelMatrix: FloatArray) {
@@ -59,10 +59,10 @@ class RenderTileObjects(private val context: Context) {
         shaderTile!!.setFloatArray("tileCountTexture[0]", tileCounts)
         val textures = intArrayOf(0, 1, 2, 3)
         shaderTile!!.setIntArray("u_texture[0]", textures)
-        textureBasis!!.Use(GLES20.GL_TEXTURE0)
-        textureMineral!!.Use(GLES20.GL_TEXTURE0 + 1)
-        textureEntity!!.Use(GLES20.GL_TEXTURE0 + 2)
-        textureFog!!.Use(GLES20.GL_TEXTURE0 + 3)
+        textureBasis!!.use(GLES20.GL_TEXTURE0)
+        textureMineral!!.use(GLES20.GL_TEXTURE0 + 1)
+        textureEntity!!.use(GLES20.GL_TEXTURE0 + 2)
+        textureFog!!.use(GLES20.GL_TEXTURE0 + 3)
         GLES30.glDrawArraysInstanced(GLES20.GL_TRIANGLES, 0, 6, tilesDataBuffer!!.capacity() / 4)
         GLES30.glBindVertexArray(0)
     }

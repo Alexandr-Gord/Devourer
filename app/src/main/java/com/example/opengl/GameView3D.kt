@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.view.View
+import kotlin.math.abs
 
 class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context, attrs) {
     var mode = NONE
@@ -19,21 +20,18 @@ class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context
     var minScale = 0.3f
     var maxScale = 3f
     var currentScale = 1.0f
-    @JvmField
-    var betweenTileCentersX = SPRITE_WIDTH * 0.75f
-    @JvmField
-    var betweenTileCentersY = SPRITE_HEIGHT.toFloat()
+
     @JvmField
     var openGLRenderer: OpenGLRenderer
-    var viewWidth = 0
-    var viewHeight //size of imageView
-            = 0
-    private var translateX = 0f
-    private var translateY = 0f
+    var viewWidth = 0 //size of imageView
+    var viewHeight = 0
+    var translateX = 0f
+    var translateY = 0f
     private var leftTranslateBound = 0f
     private var rightTranslateBound = 0f
     private var topTranslateBound = 0f
     private var bottomTranslateBound = 0f
+
     @JvmField
     var testMode = false
 
@@ -82,7 +80,8 @@ class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context
                     translateX += deltaX
                     translateY -= deltaY
                     fixTranslate()
-                    Game.instance.setMessage1("maxTransX:" + Game.instance.tileMapHeight)
+                    //Game.instance.setMessage1("maxTransX:" + Game.instance.tileMapHeight)
+                    Game.instance.viewMoveHandler()
                     queueEvent(Runnable
                     // This method will be called on the rendering
                     // thread:
@@ -92,8 +91,8 @@ class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context
 
                 MotionEvent.ACTION_UP -> {
                     mode = NONE
-                    val xDiff = Math.abs(curr.x - start.x).toInt()
-                    val yDiff = Math.abs(curr.y - start.y).toInt()
+                    val xDiff = abs(curr.x - start.x).toInt()
+                    val yDiff = abs(curr.y - start.y).toInt()
                     if (xDiff < CLICK && yDiff < CLICK) {
                         val indPos = calcMapIndex(touchGlobalX, touchGlobalY)
                         Game.instance.tileClickHandler(indPos[0], indPos[1])
@@ -163,15 +162,13 @@ class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context
                 fixTranslate()
                 Game.instance
                     .setMessage1("focusX:" + detector.focusX + " focusY:" + detector.focusY)
-
+                Game.instance.viewMoveHandler()
                 //translateY = translateY * ( -mScaleFactor) - detector.getFocusY() * (1 - mScaleFactor);
                 //bitmapTransY = -transMatrix[Matrix.MTRANS_Y] * mScaleFactor - detector.getFocusY() * (1 - mScaleFactor);
-                queueEvent(object : Runnable {
-                    override fun run() {
-                        openGLRenderer.setTranslate(translateX, translateY)
-                        openGLRenderer.setCurrentScale(currentScale)
-                    }
-                })
+                queueEvent {
+                    openGLRenderer.setTranslate(translateX, translateY)
+                    openGLRenderer.setCurrentScale(currentScale)
+                }
             }
             return true
         }
@@ -203,12 +200,10 @@ class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context
         calculateMinScale()
         translateX = (leftTranslateBound + rightTranslateBound) * 0.5f
         translateY = (topTranslateBound + bottomTranslateBound) * 0.5f
-        queueEvent(object : Runnable {
-            override fun run() {
-                openGLRenderer.setTranslate(translateX, translateY)
-                openGLRenderer.setCurrentScale(currentScale)
-            }
-        })
+        queueEvent {
+            openGLRenderer.setTranslate(translateX, translateY)
+            openGLRenderer.setCurrentScale(currentScale)
+        }
     }
 
     fun calcMapIndex(pointX: Float, pointY: Float): IntArray {
@@ -252,16 +247,18 @@ class GameView3D(context: Context, attrs: AttributeSet?) : GLSurfaceView(context
         return mapInd
     }
 
-    fun square(`var`: Float): Float {
-        return `var` * `var`
+    private fun square(number: Float): Float {
+        return number * number
     }
 
     companion object {
-        val NONE = 0
-        val DRAG = 1
-        val ZOOM = 2
-        val CLICK = 5
-        val SPRITE_WIDTH = 149
-        val SPRITE_HEIGHT = 129
+        const val NONE = 0
+        const val DRAG = 1
+        const val ZOOM = 2
+        const val CLICK = 5
+        const val SPRITE_WIDTH = 149
+        const val SPRITE_HEIGHT = 129
+        var betweenTileCentersX = SPRITE_WIDTH * 0.75f
+        var betweenTileCentersY = SPRITE_HEIGHT.toFloat()
     }
 }

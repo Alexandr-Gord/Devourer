@@ -28,16 +28,16 @@ class SelectButton(context: Context?, attrs: AttributeSet?) : AppCompatImageButt
     var canvas: Canvas
     private val imageWidth: Int
     private val imageHeight: Int
-    fun onView() {
-        instance.mode = Game.Mode.VIEW
+    private fun onView() {
+        instance.onBtnViewClickHandler()
     }
 
-    fun onBuild() {
-        instance.mode = Game.Mode.BUILD
+    private fun onBuild() {
+        instance.onBtnBuildClickHandler()
     }
 
-    fun onDelete() {
-        instance.mode = Game.Mode.DELETE
+    private fun onDelete() {
+        instance.onBtnDeleteClickHandler()
     }
 
     private var state: FlashEnum? = null

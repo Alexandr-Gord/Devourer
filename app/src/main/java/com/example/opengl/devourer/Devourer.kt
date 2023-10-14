@@ -1,6 +1,7 @@
 package com.example.opengl.devourer
 
 import com.example.opengl.Game
+import com.example.opengl.GameView3D
 import com.example.opengl.Position
 import com.example.opengl.PositionInd
 import com.example.opengl.Resource
@@ -12,11 +13,7 @@ import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
 
-class Devourer(
-    private val tileMap: TileMap,
-    private val betweenTileCentersX: Float,
-    private val betweenTileCentersY: Float,
-) {
+class Devourer(private val tileMap: TileMap) {
     enum class DevourerState {
         NORMAL, EATING
     }
@@ -61,12 +58,12 @@ class Devourer(
 
     private val currentAnimationSpriteNumber: Float
         get() {
-            var result = 0
+            var result = 0f
             result = when (devourerState) {
                 DevourerState.NORMAL -> NORMAL_PHASES[animationPhase]
                 DevourerState.EATING -> EATING_PHASES[animationPhase]
-            }
-            return result.toFloat()
+            }.toFloat()
+            return result
         }
 
     private fun setDevourerState(newDevourerState: DevourerState) {
@@ -90,7 +87,8 @@ class Devourer(
                     if (resource.isMoving) {
                         resource.move(MINERAL_SPEED)
                     } else {
-                        resource.tryMove(MINERAL_SPEED)                    }
+                        resource.tryMove(MINERAL_SPEED)
+                    }
                     if (resource.isDelivered) {
                         resourcesStorage.addMineral(resource.mineralType, 1)
                         setDevourerState(DevourerState.EATING)
@@ -174,11 +172,11 @@ class Devourer(
 
     private fun calculateDevourerNodePosition(positionInd: PositionInd): Position {
         val result = Position()
-        result.x = positionInd.x * betweenTileCentersX
+        result.x = positionInd.x * GameView3D.betweenTileCentersX
         if (positionInd.x % 2 == 0) {
-            result.y = positionInd.y * betweenTileCentersY
+            result.y = positionInd.y * GameView3D.betweenTileCentersY
         } else {
-            result.y = (positionInd.y + 0.5f) * betweenTileCentersY
+            result.y = (positionInd.y + 0.5f) * GameView3D.betweenTileCentersY
         }
         return result
     }
@@ -210,6 +208,6 @@ class Devourer(
         private val NORMAL_PHASES = intArrayOf(
             0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 22, 22, 22, 22, 22, 2, 2, 2, 1, 1, 1
         )
-        private val MINERAL_SPEED : Float = 0.1f
+        private const val MINERAL_SPEED: Float = 0.1f
     }
 }

@@ -2,8 +2,10 @@ package com.example.opengl
 
 import android.content.Context
 import android.opengl.GLES20
+import android.opengl.GLES20.GL_ALPHA
 import android.opengl.GLES20.GL_ONE
 import android.opengl.GLES20.GL_ONE_MINUS_SRC_ALPHA
+import android.opengl.GLES20.GL_SRC_ALPHA
 import android.opengl.GLES20.glBlendFunc
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
@@ -13,6 +15,7 @@ import javax.microedition.khronos.opengles.GL10
 class OpenGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     var renderTileObjects : RenderTileObjects? = null
     var renderFreeObjects : RenderFreeObjects? = null
+    var renderText : RenderText? = null
     private var startTime = System.nanoTime()
     private var frames = 0
     private var fps = 0
@@ -44,9 +47,11 @@ class OpenGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
             GLES20.GL_ZERO
         )
         */
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         renderTileObjects = RenderTileObjects(context)
         renderFreeObjects = RenderFreeObjects(context)
+        renderText = RenderText(context)
     }
 
     override fun onSurfaceChanged(arg0: GL10, width: Int, height: Int) {
@@ -68,8 +73,11 @@ class OpenGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         Matrix.scaleM(scaleMatrix, 0, currentScale, currentScale, 0f)
         Matrix.multiplyMM(mModelMatrix, 0, transMatrix, 0, scaleMatrix, 0)
 
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
         renderTileObjects!!.draw(mProjectionMatrix, mModelMatrix)
         renderFreeObjects!!.draw(mProjectionMatrix, mModelMatrix)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        renderText!!.draw(mProjectionMatrix, mModelMatrix)
 
         logFrame()
     }
@@ -197,3 +205,4 @@ class OpenGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 // https://arm-software.github.io/opengl-es-sdk-for-android/pages.html
 
 // https://en.wikipedia.org/wiki/Strip_packing_problem
+// https://www.david-colson.com/2020/03/10/exploring-rect-packing.html

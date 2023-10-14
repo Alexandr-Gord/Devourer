@@ -1,13 +1,14 @@
 package com.example.opengl
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.core.content.ContextCompat
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import com.example.opengl.devourer.Devourer
 import com.example.opengl.text2D.FontData
 import com.example.opengl.text2D.FontDataStorage
+import com.example.opengl.text2D.Label
 import com.example.opengl.text2D.Text2D
 import com.example.opengl.text2D.TextStorage
 import com.example.opengl.tiles.MineralType
@@ -25,6 +26,7 @@ class Game private constructor() : BaseObservable() {
     var tileMapWidth = 35
     var tileMapHeight = 25
     var devourer: Devourer? = null
+    var tileDescription: TileDescription? = null
 
     @JvmField
     var mode = Mode.VIEW
@@ -57,28 +59,68 @@ class Game private constructor() : BaseObservable() {
                 gameActivity!!.resources.openRawResource(R.raw.entity_map)
             )
         }
-        devourer =
-            Devourer(tileMap!!, gameView3D!!.betweenTileCentersX, gameView3D!!.betweenTileCentersY)
+        devourer = Devourer(tileMap!!)
         mineralTimer?.cancel()
         mineralTimer = Timer()
-        //val handler = Handler()
         val runnable = Runnable {
-            redraw()
-            mineralTimer!!.schedule(object : TimerTask() {
-                override fun run() {
-                    mineralTimerTick()
-                }
-            }, 0, 33)
+            initWithDelay()
         }
         gameView3D!!.postDelayed(runnable, 1000) // TODO remake
         setShowMessage(false)
+    }
+
+    private fun initWithDelay() {
+        redraw()
+        mineralTimer!!.schedule(object : TimerTask() {
+            override fun run() {
+                mineralTimerTick()
+            }
+        }, 0, 33)
 
         val fontData: FontData =
-            FontData(context = gameView3D!!.context, fontFilename = "", size = 10.0f)
+            FontData(
+                context = gameView3D!!.context,
+                fontFilename = "",
+                size = 50.0f,
+                charsLeftSpaceInTexture = 6f,
+                charsRightSpaceInTexture = 3f
+            )
         FontDataStorage.setDefaultFontData(fontData)
-        //val myColor: Int = R.color.white
-        val text1 = Text2D("Welcome", FontDataStorage.getFontData(""), 0f, 0f, 1f, Color.RED)
-        TextStorage.addText2D("greetings", text1)
+        val fontPixel: FontData =
+            FontData(
+                context = gameView3D!!.context,
+                fontFilename = "fonts/advanced_pixel-7.ttf",
+                size = 80.0f
+            )
+        FontDataStorage.addFontData("pixel", fontPixel)
+
+        /*
+        val text1 = Text2D("Welcome", FontDataStorage.getFontData(""), 50f, 150f, 1.5f, Color.RED)
+        val text2 =
+            Text2D("Username", FontDataStorage.getFontData("pixel"), 70f, 50f, 1.5f, Color.YELLOW)
+
+        val label: Label = Label(50f, 500f, 448f, 280f)
+        label.setBackgroundAssetFile("images/frame.png")
+        label.addText2D("greetings", text1)
+        label.addText2D("user", text2)
+        TextStorage.addLabel("label", label)
+         */
+
+        tileDescription = TileDescription(tileMap!!, gameView3D!!)
+
+        val bitmapImages: Bitmap = TextStorage.createLabelsBitmap(gameView3D!!.context)
+        val bitmapFonts: Bitmap = FontDataStorage.createFontsBitmap();
+        gameView3D!!.queueEvent {
+            gameView3D!!.openGLRenderer.renderText?.initFontsTexture(bitmapFonts)
+            bitmapFonts.recycle()
+            gameView3D!!.openGLRenderer.renderText?.initImagesTexture(bitmapImages)
+            bitmapImages.recycle()
+
+            //tileDescription!!.setIsShow(true)
+            //tileDescription!!.setPosition(50f, 400f)
+        }
+
+
     }
 
     private fun mineralTimerTick() {
@@ -171,16 +213,51 @@ class Game private constructor() : BaseObservable() {
         }
     }
 
+    fun viewMoveHandler() {
+        if (mode == Mode.VIEW) {
+            if (tileMap!!.lastSelectedTileIndX > -1 && tileMap!!.lastSelectedTileIndY > -1) {
+                tileDescription?.calculatePosition(
+                    tileMap!!.lastSelectedTileIndX,
+                    tileMap!!.lastSelectedTileIndY
+                )
+                redraw()
+            }
+        }
+    }
+
+    fun onBtnViewClickHandler() {
+        mode = Mode.VIEW
+        tileDescription?.setIsShow(true)
+        tileDescription?.setIsShow(false)
+    }
+
+    fun  onBtnBuildClickHandler() {
+        mode = Mode.BUILD
+        removeSelectTile()
+        tileDescription?.setIsShow(false)
+    }
+
+    fun   onBtnDeleteClickHandler() {
+        mode = Mode.DELETE
+        removeSelectTile()
+        tileDescription?.setIsShow(false)
+    }
+
     private fun redraw() {
         gameView3D!!.queueEvent {
             gameView3D!!.openGLRenderer.renderTileObjects?.prepareTileData(createRenderDataTile())
             gameView3D!!.openGLRenderer.renderFreeObjects?.prepareMovingData(devourer!!.createRenderDataMoving())
+            gameView3D!!.openGLRenderer.renderText?.prepareTextData(TextStorage.createRenderDataText())
         }
     }
 
     private fun selectTile(indX: Int, indY: Int) {
+        if (tileMap!!.lastSelectedTileIndX == indX && tileMap!!.lastSelectedTileIndY == indY) return
         tileMap!!.lastSelectedTileIndX = indX
         tileMap!!.lastSelectedTileIndY = indY
+        tileDescription!!.setIsShow(true)
+        tileDescription!!.initTile(indX, indY)
+
         val node = devourer!!.getDevourerNode(indX, indY)
         val dist = node?.dist ?: -1
         //showMessage("indX:" + indX + " indY:" + indY + " dist:" + dist);
@@ -188,9 +265,9 @@ class Game private constructor() : BaseObservable() {
         redraw()
     }
 
-    private fun removeSelectTile() {
-        tileMap!!.lastSelectedTileIndX = -1
-        tileMap!!.lastSelectedTileIndY = -1
+    fun removeSelectTile() {
+        tileMap?.lastSelectedTileIndX = -1
+        tileMap?.lastSelectedTileIndY = -1
     }
 
     companion object {
