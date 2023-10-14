@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.opengl.GLES30
-import android.opengl.Matrix
 import java.io.IOException
 import java.nio.FloatBuffer
 import java.util.concurrent.locks.ReentrantLock
@@ -14,7 +13,8 @@ class RenderText(private val context: Context) {
     private var shaderText: Shader? = null
     private var vertexUnitDataBuffer: FloatBuffer? = null
     private var textDataBuffer: FloatBuffer? = null
-    var textureFont: Texture? = null
+    private var textureFont: Texture? = null
+    private var textureImages: Texture? = null
     private var vertexArrayObjectText = 0
     private var vertexBufferObjectInstancedText = 0
     private var mProjectionMatrix = FloatArray(16)
@@ -27,18 +27,21 @@ class RenderText(private val context: Context) {
         } catch (e: IOException) {
             null
         }
-        //textureFont = Texture.create(context, R.drawable.main_texture, 23)
     }
 
-    fun initTexture(bitmap: Bitmap) {
-        //shaderText?.use()
-        textureFont = Texture.create(context, bitmap)
+    fun initFontsTexture(bitmap: Bitmap) {
+        textureFont = Texture.createFontsTexture(context, bitmap)
         isReady = true
+    }
+
+    fun initImagesTexture(bitmap: Bitmap) {
+        textureImages = Texture.create(context, bitmap)
+        // TODO isReady ?????
     }
 
     fun draw(projectionMatrix: FloatArray, modelMatrix: FloatArray) {
         //if (!isReady) return
-        if (textureFont != null) {
+        if (textureFont != null && textureImages != null) {
             if (textDataBuffer != null && shaderText != null) {
                 mProjectionMatrix = projectionMatrix
                 mModelMatrix = modelMatrix
@@ -52,25 +55,18 @@ class RenderText(private val context: Context) {
     }
 
     private fun drawText() {
-        val scaleMatrix = FloatArray(16)
-        Matrix.setIdentityM(scaleMatrix, 0)
-        Matrix.scaleM(scaleMatrix, 0, 1.0f, 1.0f, 0f)
-
         shaderText!!.use()
         GLES30.glBindVertexArray(vertexArrayObjectText)
         shaderText!!.setMatrix4("projection", mProjectionMatrix)
-        //shaderText!!.setMatrix4("model", mModelMatrix)
-        //shaderText!!.setMatrix4("model", scaleMatrix)
-        shaderText!!.setVector2("sizeTexture", textureFont!!.width.toFloat(), textureFont!!.height.toFloat())
-
-        //val textColor = floatArrayOf(1f, 0f, 1f)
-        //shaderText!!.setVector3("u_textColor", textColor)
-        shaderText!!.setInt("u_texture", 6)
-        textureFont!!.use(GLES20.GL_TEXTURE0 + 6)
-        GLES30.glDrawArraysInstanced(GLES20.GL_TRIANGLES, 0, 6, textDataBuffer!!.capacity() / 12)
+        shaderText!!.setVector2("sizeFontsTexture", textureFont!!.width.toFloat(), textureFont!!.height.toFloat())
+        shaderText!!.setVector2("sizeImagesTexture", textureImages!!.width.toFloat(), textureImages!!.height.toFloat())
+        shaderText!!.setInt("u_textureFonts", 6)
+        textureFont!!.use(GLES20.GL_TEXTURE6)
+        shaderText!!.setInt("u_textureImages", 7)
+        textureImages!!.use(GLES20.GL_TEXTURE7)
+        GLES30.glDrawArraysInstanced(GLES20.GL_TRIANGLES, 0, 6, textDataBuffer!!.capacity() / 14)
         GLES30.glBindVertexArray(0)
     }
-
 
     private fun prepareVerticesData() {
 
@@ -164,7 +160,7 @@ class RenderText(private val context: Context) {
             2,
             GLES20.GL_FLOAT,
             false,
-            12 * FLOAT_SIZE_BYTES,
+            14 * FLOAT_SIZE_BYTES,
             0
         )
         val charSize = shaderText!!.getAttribLocation("aCharSize")
@@ -174,7 +170,7 @@ class RenderText(private val context: Context) {
             2,
             GLES20.GL_FLOAT,
             false,
-            12 * FLOAT_SIZE_BYTES,
+            14 * FLOAT_SIZE_BYTES,
             2 * FLOAT_SIZE_BYTES
         )
         val charPosInTexture = shaderText!!.getAttribLocation("aCharPosInTexture")
@@ -184,7 +180,7 @@ class RenderText(private val context: Context) {
             2,
             GLES20.GL_FLOAT,
             false,
-            12 * FLOAT_SIZE_BYTES,
+            14 * FLOAT_SIZE_BYTES,
             4 * FLOAT_SIZE_BYTES
         )
         val textColor = shaderText!!.getAttribLocation("aTextColor")
@@ -194,7 +190,7 @@ class RenderText(private val context: Context) {
             3,
             GLES20.GL_FLOAT,
             false,
-            12 * FLOAT_SIZE_BYTES,
+            14 * FLOAT_SIZE_BYTES,
             6 * FLOAT_SIZE_BYTES
         )
         val textStartPos = shaderText!!.getAttribLocation("aTextStartPos")
@@ -204,18 +200,28 @@ class RenderText(private val context: Context) {
             2,
             GLES20.GL_FLOAT,
             false,
-            12 * FLOAT_SIZE_BYTES,
+            14 * FLOAT_SIZE_BYTES,
             9 * FLOAT_SIZE_BYTES
         )
         val scale = shaderText!!.getAttribLocation("aScale")
         GLES20.glEnableVertexAttribArray(scale)
         GLES20.glVertexAttribPointer(
             scale,
+            2,
+            GLES20.GL_FLOAT,
+            false,
+            14 * FLOAT_SIZE_BYTES,
+            11 * FLOAT_SIZE_BYTES
+        )
+        val type = shaderText!!.getAttribLocation("aType")
+        GLES20.glEnableVertexAttribArray(type)
+        GLES20.glVertexAttribPointer(
+            type,
             1,
             GLES20.GL_FLOAT,
             false,
-            12 * FLOAT_SIZE_BYTES,
-            11 * FLOAT_SIZE_BYTES
+            14 * FLOAT_SIZE_BYTES,
+            13 * FLOAT_SIZE_BYTES
         )
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0)
         GLES30.glVertexAttribDivisor(charPos, 1)
@@ -224,6 +230,7 @@ class RenderText(private val context: Context) {
         GLES30.glVertexAttribDivisor(textColor, 1)
         GLES30.glVertexAttribDivisor(textStartPos, 1)
         GLES30.glVertexAttribDivisor(scale, 1)
+        GLES30.glVertexAttribDivisor(type, 1)
         GLES20.glEnableVertexAttribArray(0)
         GLES30.glBindVertexArray(0)
     }
