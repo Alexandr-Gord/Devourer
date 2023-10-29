@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
+import com.example.opengl.constants.DevourerType
 import com.example.opengl.devourer.Devourer
 import com.example.opengl.text2D.FontData
 import com.example.opengl.text2D.FontDataStorage
@@ -28,17 +29,24 @@ class Game private constructor() : BaseObservable() {
     var devourer: Devourer? = null
     var tileDescription: TileDescription? = null
 
-    @JvmField
+    //@JvmField
     var mode = Mode.VIEW
+    //@JvmField
+    var devourerType = DevourerType.BASE
+
     private var isShowMessage = false
     private var mineralTimer: Timer? = null
     private var message1: String = ""
     private var message2: String = ""
-
+/*
     enum class Mode {
         BUILD, VIEW, DELETE
     }
 
+    enum class DevourerType {
+        BASE, PIPE, GLOW
+    }
+ */
     fun startUp() {
         val mapProperties = getMapProperties(R.raw.map_properties, gameActivity!!)
             ?: fail("Error reading properties file")
@@ -199,7 +207,7 @@ class Game private constructor() : BaseObservable() {
             Mode.VIEW -> selectTile(indX, indY)
             Mode.BUILD -> {
                 removeSelectTile()
-                devourer!!.placeDevourer(indX, indY)
+                devourer!!.placeDevourer(indX, indY, devourerType)
                 redraw()
             }
 
@@ -231,16 +239,28 @@ class Game private constructor() : BaseObservable() {
         tileDescription?.setIsShow(false)
     }
 
-    fun  onBtnBuildClickHandler() {
+    fun onBtnBuildClickHandler() {
         mode = Mode.BUILD
         removeSelectTile()
         tileDescription?.setIsShow(false)
     }
 
-    fun   onBtnDeleteClickHandler() {
+    fun onBtnDeleteClickHandler() {
         mode = Mode.DELETE
         removeSelectTile()
         tileDescription?.setIsShow(false)
+    }
+
+    fun onBtnDevourerBaseClickHandler() {
+        devourerType = DevourerType.BASE
+    }
+
+    fun onBtnDevourerPipeClickHandler() {
+        devourerType = DevourerType.PIPE
+    }
+
+    fun onBtnDevourerGlowClickHandler() {
+        devourerType = DevourerType.GLOW
     }
 
     private fun redraw() {
@@ -273,6 +293,15 @@ class Game private constructor() : BaseObservable() {
     companion object {
         @JvmStatic
         val instance = Game()
+
+        enum class Mode {
+            BUILD, VIEW, DELETE
+        }
+/*
+        enum class DevourerType {
+            BASE, PIPE, GLOW
+        }
+*/
         fun getMapProperties(mapPropertiesId: Int, context: Context): Properties? {
             return try {
                 val inputStream = context.resources.openRawResource(mapPropertiesId)

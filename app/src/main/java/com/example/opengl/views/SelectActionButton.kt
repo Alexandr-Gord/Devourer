@@ -1,4 +1,4 @@
-package com.example.opengl
+package com.example.opengl.views
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -14,9 +14,10 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageButton
 import com.example.opengl.Game.Companion.instance
+import com.example.opengl.R
 
-class SelectButton(context: Context?, attrs: AttributeSet?) : AppCompatImageButton(
-    context!!, attrs
+class SelectActionButton(context: Context, attrs: AttributeSet?) : AppCompatImageButton(
+    context, attrs
 ) {
     enum class FlashEnum {
         BUILD, VIEW, DELETE

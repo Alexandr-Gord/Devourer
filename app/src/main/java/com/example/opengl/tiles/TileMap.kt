@@ -2,6 +2,7 @@ package com.example.opengl.tiles
 
 import com.example.opengl.Resource
 import com.example.opengl.ResourceDepository
+import com.example.opengl.constants.DevourerType
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -135,7 +136,7 @@ class TileMap(
         when (id) {
             0 -> {
                 mineral = Mineral()
-                mineral.id = id
+                mineral.id = 0
                 mineral.type = MineralType.GOLD
             }
 
@@ -175,7 +176,7 @@ class TileMap(
         var entity: Entity? = null
         when (code.toInt()) {
             0 -> {}
-            2 -> entity = EntityTransport()
+            2 -> entity = EntityDevourerBase()
         }
         return entity
     }
@@ -209,41 +210,41 @@ class TileMap(
         var code = 0
         if (indX % 2 == 0) {
             if (isTileExist(indX, indY - 1) && isMineralEqual(indX, indY - 1, type)) {
-                code = code + 1
+                code += 1
             }
             if (isTileExist(indX + 1, indY - 1) && isMineralEqual(indX + 1, indY - 1, type)) {
-                code = code + 2
+                code += 2
             }
             if (isTileExist(indX + 1, indY) && isMineralEqual(indX + 1, indY, type)) {
-                code = code + 4
+                code += 4
             }
             if (isTileExist(indX, indY + 1) && isMineralEqual(indX, indY + 1, type)) {
-                code = code + 8
+                code += 8
             }
             if (isTileExist(indX - 1, indY) && isMineralEqual(indX - 1, indY, type)) {
-                code = code + 16
+                code += 16
             }
             if (isTileExist(indX - 1, indY - 1) && isMineralEqual(indX - 1, indY - 1, type)) {
-                code = code + 32
+                code += 32
             }
         } else {
             if (isTileExist(indX, indY - 1) && isMineralEqual(indX, indY - 1, type)) {
-                code = code + 1
+                code += 1
             }
             if (isTileExist(indX + 1, indY) && isMineralEqual(indX + 1, indY, type)) {
-                code = code + 2
+                code += 2
             }
             if (isTileExist(indX + 1, indY + 1) && isMineralEqual(indX + 1, indY + 1, type)) {
-                code = code + 4
+                code += 4
             }
             if (isTileExist(indX, indY + 1) && isMineralEqual(indX, indY + 1, type)) {
-                code = code + 8
+                code += 8
             }
             if (isTileExist(indX - 1, indY + 1) && isMineralEqual(indX - 1, indY + 1, type)) {
-                code = code + 16
+                code += 16
             }
             if (isTileExist(indX - 1, indY) && isMineralEqual(indX - 1, indY, type)) {
-                code = code + 32
+                code += 32
             }
         }
         return code
@@ -257,57 +258,47 @@ class TileMap(
         var code = 0
         if (indX % 2 == 0) {
             if (isTileExist(indX, indY - 1) && isEntity(indX, indY - 1)) {
-                code = code + 1
+                code += 1
             }
             if (isTileExist(indX + 1, indY - 1) && isEntity(indX + 1, indY - 1)) {
-                code = code + 2
+                code += 2
             }
             if (isTileExist(indX + 1, indY) && isEntity(indX + 1, indY)) {
-                code = code + 4
+                code += 4
             }
             if (isTileExist(indX, indY + 1) && isEntity(indX, indY + 1)) {
-                code = code + 8
+                code += 8
             }
             if (isTileExist(indX - 1, indY) && isEntity(indX - 1, indY)) {
-                code = code + 16
+                code += 16
             }
             if (isTileExist(indX - 1, indY - 1) && isEntity(indX - 1, indY - 1)) {
-                code = code + 32
+                code += 32
             }
         } else {
             if (isTileExist(indX, indY - 1) && isEntity(indX, indY - 1)) {
-                code = code + 1
+                code += 1
             }
             if (isTileExist(indX + 1, indY) && isEntity(indX + 1, indY)) {
-                code = code + 2
+                code += 2
             }
             if (isTileExist(indX + 1, indY + 1) && isEntity(indX + 1, indY + 1)) {
-                code = code + 4
+                code += 4
             }
             if (isTileExist(indX, indY + 1) && isEntity(indX, indY + 1)) {
-                code = code + 8
+                code += 8
             }
             if (isTileExist(indX - 1, indY + 1) && isEntity(indX - 1, indY + 1)) {
-                code = code + 16
+                code += 16
             }
             if (isTileExist(indX - 1, indY) && isEntity(indX - 1, indY)) {
-                code = code + 32
+                code += 32
             }
         }
         return code
-    }// tile number
+    }
 
-    // texture number
-// tile number
-    // texture number
-// tile number
-    // texture number
-//if ((tile.getEntity() != null) && (tile.getFogTileId() != FULL_FOG_TILE_CODE)) {// tile number
-    // texture number
-// tile number
-    // texture number
-    //if ((tile.getBasis() != null) && (tile.getFogTileId() != FULL_FOG_TILE_CODE)) {
-    val tileMapData: List<Short>
+    val tileMapData1: List<Short>
         get() {
             val result: MutableList<Short> = ArrayList()
             synchronized(tileList) {
@@ -350,7 +341,8 @@ class TileMap(
                 for (y in 0 until tileMapHeight) {
                     for (x in 0 until tileMapWidth) {
                         tile = getTile(x, y)
-                        if (tile!!.isFogged) {
+                        //if (tile!!.isFogged) {
+                        if (tile!!.fogTileId == FULL_FOG_TILE_CODE) {
                             result.add(x.toShort())
                             result.add(y.toShort())
                             result.add(tile.fogTileId.toShort()) // tile number
@@ -367,6 +359,79 @@ class TileMap(
             }
             return result
         }
+
+    val tileMapData: List<Short>
+        get() {
+            val layerBasis: MutableList<Short> = ArrayList()
+            val layerMineral: MutableList<Short> = ArrayList()
+            val layerDevourer: MutableList<Short> = ArrayList()
+            val layerFog: MutableList<Short> = ArrayList()
+            synchronized(tileList) {
+                var tile: Tile?
+                for (y in 0 until tileMapHeight) {
+                    for (x in 0 until tileMapWidth) {
+                        // TODO show not full map, only tiles in screen
+                        tile = getTile(x, y)
+                        if (tile == null) continue
+                        if (tile.fogTileId != FULL_FOG_TILE_CODE) {
+                            if (tile.basis != null) {
+                                layerBasis.add(x.toShort())
+                                layerBasis.add(y.toShort())
+                                layerBasis.add(0.toShort()) // tile number
+                                layerBasis.add(0.toShort()) // texture number
+                            }
+
+                            if (tile.mineral != null) {
+                                layerMineral.add(x.toShort())
+                                layerMineral.add(y.toShort())
+                                layerMineral.add(tile.mineral!!.id.toShort()) // tile number
+                                layerMineral.add(1.toShort()) // texture number
+                            }
+
+                            if (tile.entity != null) {
+                                layerDevourer.add(x.toShort())
+                                layerDevourer.add(y.toShort())
+                                when (tile.entity) {
+                                    is EntityDevourerBase -> {
+                                        layerDevourer.add(tile.entity!!.id.toShort()) // tile number
+                                        layerDevourer.add(2.toShort()) // texture number
+                                    }
+
+                                    is EntityDevourerPipe -> {
+                                        layerDevourer.add(tile.entity!!.id.toShort()) // tile number
+                                        layerDevourer.add(4.toShort()) // texture number
+                                    }
+
+                                    is EntityDevourerGlow -> {
+                                        layerDevourer.add(2.toShort()) // tile number
+                                        layerDevourer.add(0.toShort()) // texture number
+                                    }
+                                }
+                            }
+                        }
+                        if (tile.fogTileId > 0) {
+                            layerFog.add(x.toShort())
+                            layerFog.add(y.toShort())
+                            layerFog.add(tile.fogTileId.toShort()) // tile number
+                            layerFog.add(3.toShort()) // texture number
+                        }
+                    }
+                }
+
+                layerBasis.addAll(layerMineral)
+                layerBasis.addAll(layerDevourer)
+                layerBasis.addAll(layerFog)
+
+                if (lastSelectedTileIndX > -1 && lastSelectedTileIndY > -1) {
+                    layerBasis.add(lastSelectedTileIndX.toShort())
+                    layerBasis.add(lastSelectedTileIndY.toShort())
+                    layerBasis.add(1.toShort()) // tile number
+                    layerBasis.add(0.toShort()) // texture number
+                }
+            }
+            return layerBasis
+        }
+
 
     private fun fixEntitySpriteID(tile: Tile, indX: Int, indY: Int) {
         tile.entity!!.id = calcEntitySpriteCode(indX, indY)
@@ -389,7 +454,7 @@ class TileMap(
         }
     }
 
-    private fun isNearEntityExist(indX: Int, indY: Int): Boolean {
+    fun isNearEntityExist(indX: Int, indY: Int): Boolean {
         val nearInd = getNearIndexes(indX, indY)
         var isExist = false
         for (i in 0..5) {
@@ -436,22 +501,32 @@ class TileMap(
         return nearInd
     }
 
-    fun placeDevourerTile(mapIndX: Int, mapIndY: Int) {
-        if (isNearEntityExist(mapIndX, mapIndY)) {
-            synchronized(tileList) {
-                getTile(mapIndX, mapIndY)!!.entity = EntityTransport()
-                fixNearTile(mapIndX, mapIndY)
-                generateFogMap() // todo generate not full map, only part
+    fun placeDevourerTile(mapIndX: Int, mapIndY: Int, devourerType: DevourerType) {
+        synchronized(tileList) {
+            when (devourerType) {
+                DevourerType.BASE -> {
+                    getTile(mapIndX, mapIndY)!!.entity = EntityDevourerBase()
+                }
+
+                DevourerType.PIPE -> {
+                    getTile(mapIndX, mapIndY)!!.entity = EntityDevourerPipe()
+                }
+
+                DevourerType.GLOW -> {
+                    getTile(mapIndX, mapIndY)!!.entity = EntityDevourerGlow()
+                }
             }
+            fixNearTile(mapIndX, mapIndY)
+            updateFogMap(mapIndX, mapIndY)
         }
     }
 
     fun deleteDevourerTile(mapIndX: Int, mapIndY: Int) {
         if (isEntity(mapIndX, mapIndY)) {
             synchronized(tileList) {
-                getTile(mapIndX, mapIndY)!!.entity = null
+                getTile(mapIndX, mapIndY)?.entity = null
                 fixNearTile(mapIndX, mapIndY)
-                generateFogMap() // todo generate not full map, only part
+                updateFogMap(mapIndX, mapIndY)
             }
         }
     }
@@ -459,49 +534,120 @@ class TileMap(
     private fun setFogAllMap() {
         for (y in 0 until tileMapHeight) {
             for (x in 0 until tileMapWidth) {
-                getTile(x, y)!!.isFogged = true
+                getTile(x, y)?.let {
+                    it.fogTileId = FULL_FOG_TILE_CODE
+                }
             }
         }
     }
 
-    private fun generateFogMap() {
+    private fun generateFogMap() { // todo segment of map
         setFogAllMap() // todo do or not in settings
-        var tile: Tile?
+        var tile: Tile
         for (y in 0 until tileMapHeight) {
             for (x in 0 until tileMapWidth) {
-                tile = getTile(x, y)
-                if (tile!!.entity != null) {
-                    tile.isFogged = false
-                    //resetFogAroundEntity(x, y); // todo fog radius in setting
+                tile = getTile(x, y) ?: continue
+                if (tile.entity != null) {
+                    tile.fogTileId = 0
                 }
             }
         }
+
         for (y in 0 until tileMapHeight) {
             for (x in 0 until tileMapWidth) {
-                tile = getTile(x, y)
-                if (tile!!.isFogged) {
+                tile = getTile(x, y) ?: continue
+                if (tile.fogTileId > 0) {
+                    tile.fogTileId = calcFogSpriteCode(x, y)
+                }
+            }
+        }
+
+        for (y in 0 until tileMapHeight) {
+            for (x in 0 until tileMapWidth) {
+                tile = getTile(x, y) ?: continue
+                if (tile.entity != null) {
+                    if (tile.entity is EntityDevourerGlow) {
+                        setGlowArea(x, y)
+                        setGlowBorder(x, y)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setGlowArea(indX: Int, indY: Int) {
+        var tile: Tile
+        for (i in GLOW_AREA_X.indices) {
+            if (indX % 2 == 0) {
+                tile = getTile(GLOW_AREA_X[i] + indX, GLOW_AREA_Y_EVEN[i] + indY) ?: continue
+                tile.fogTileId = 0
+            } else {
+                tile = getTile(GLOW_AREA_X[i] + indX, GLOW_AREA_Y_ODD[i] + indY) ?: continue
+                tile.fogTileId = 0
+            }
+        }
+    }
+
+    private fun setGlowBorder(indX: Int, indY: Int) {
+        var tile: Tile
+        var x: Int
+        var y: Int
+        for (i in GLOW_BORDER_X.indices) {
+            x = GLOW_BORDER_X[i] + indX
+            if (indX % 2 == 0) {
+                y = GLOW_BORDER_Y_EVEN[i] + indY
+                tile = getTile(x, y) ?: continue
+                if (tile.fogTileId > 0) {
+                    tile.fogTileId = calcFogSpriteCode(x, y)
+                }
+            } else {
+                y = GLOW_BORDER_Y_ODD[i] + indY
+                tile = getTile(x, y) ?: continue
+                if (tile.fogTileId > 0) {
                     tile.fogTileId = calcFogSpriteCode(x, y)
                 }
             }
         }
     }
 
-    private fun resetFogAroundEntity(indX: Int, indY: Int) {
+    private fun setFogAroundEntity(indX: Int, indY: Int) {
         val nearInd = getNearIndexes(indX, indY)
+        var tile: Tile
         var nearIndX: Int
         var nearIndY: Int
         for (i in 0..5) {
             nearIndX = nearInd[i][0]
             nearIndY = nearInd[i][1]
-            if (nearIndX < tileMapWidth && nearIndY < tileMapHeight && nearIndX > -1 && nearIndY > -1) {
-                getTile(nearIndX, nearIndY)!!.isFogged = false
+            tile = getTile(nearIndX, nearIndY) ?: continue
+            if (tile.fogTileId > 0) {
+                tile.fogTileId = calcFogSpriteCode(nearIndX, nearIndY)
+            }
+        }
+    }
+
+    private fun updateFogMap(indX: Int, indY: Int) {
+        val tile: Tile = getTile(indX, indY) ?: return
+        when (tile.entity) {
+            is EntityDevourerGlow -> {
+                tile.fogTileId = 0
+                setGlowArea(indX, indY)
+                setGlowBorder(indX, indY)
+            }
+
+            is EntityDevourerBase, is EntityDevourerPipe -> {
+                tile.fogTileId = 0
+                setFogAroundEntity(indX, indY)
+            }
+
+            null -> { // entity deleted
+                generateFogMap()
             }
         }
     }
 
     private fun isFogged(indX: Int, indY: Int): Boolean {
         return if (indX < tileMapWidth && indX > -1 && indY < tileMapHeight && indY > -1) {
-            getTile(indX, indY)!!.isFogged
+            getTile(indX, indY)!!.fogTileId > 0
         } else {
             true
         }
@@ -563,5 +709,18 @@ class TileMap(
             15, 19, 24, 28
         )
         private const val FULL_FOG_TILE_CODE = 28
+
+        private val GLOW_AREA_X =
+            intArrayOf(0, 1, 1, 0, -1, -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2, -1)
+        private val GLOW_AREA_Y_EVEN =
+            intArrayOf(-1, -1, 0, 1, 0, -1, -2, -2, -1, 0, 1, 1, 2, 1, 1, 0, -1, -2)
+        private val GLOW_AREA_Y_ODD =
+            intArrayOf(-1, 0, 1, 1, 1, 0, -2, -1, -1, 0, 1, 2, 2, 2, 1, 0, -1, -1)
+        private val GLOW_BORDER_X =
+            intArrayOf(0, 1, 2, 3, 3, 3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -3, -2, -1)
+        private val GLOW_BORDER_Y_EVEN =
+            intArrayOf(-3, -3, -2, -2, -1, 0, 1, 2, 2, 3, 2, 2, 1, 0, -1, -2, -2, -3)
+        private val GLOW_BORDER_Y_ODD =
+            intArrayOf(-3, -2, -2, -1, 0, 1, 2, 2, 3, 3, 3, 2, 2, 1, 0, -1, -2, -2)
     }
 }

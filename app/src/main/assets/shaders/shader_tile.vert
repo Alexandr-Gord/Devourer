@@ -8,7 +8,7 @@ layout (location = 5) attribute float aTextureNumber;
 uniform mat4 model;
 uniform mat4 projection;
 //uniform float mapHeight;
-uniform float tileCountTexture[4];
+uniform float tileCountTexture[5];
 
 varying vec2 TexCoords;
 varying float TextureNumber;
@@ -24,14 +24,14 @@ void main()
     int number = int(aTextureNumber);
     if (number == 0) { // base
                        //TexCoords = CorrectTexCoords(aTexCoords, 0.98) * vec2(1.0, 1.0 / tileCountTexture[0]) + vec2(0.0, aTileNumber / tileCountTexture[0]);
-                       //TexCoords = CorrectTexCoords(aTexCoords, 0.98);
-                       TexCoords = aTexCoords;
+                       TexCoords = CorrectTexCoords(aTexCoords, 0.994);
+                       //TexCoords = aTexCoords;
                        TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[0];
     } else if (number == 1) { // minerals
                               //TexCoords = a TexCoords * vec2(1.0, 1.0 / tileCountTexture[1]) + vec2(0.0, aTileNumber / tileCountTexture[1]);
                               TexCoords = aTexCoords;
                               TexCoords.y = (1.0 - TexCoords.y + aTileNumber) / tileCountTexture[1];
-    } else if (number == 2) { // devourer
+    } else if (number == 2) { // devourer base
                               //TexCoords = aTexCoords * vec2(1.0, 1.0 / tileCountTexture[2]) + vec2(0.0, aTileNumber / tileCountTexture[2]);
                               TexCoords = aTexCoords;
                               TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[2];
@@ -39,6 +39,9 @@ void main()
                               //TexCoords = CorrectTexCoords(aTexCoords, 0.99) * vec2(1.0, 1.0 / tileCountTexture[3]) + vec2(0.0, aTileNumber / tileCountTexture[3]);
                               TexCoords = CorrectTexCoords(aTexCoords, 0.993);
                               TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[3];
+    } else if (number == 4) { // devourer pipe
+                              TexCoords = aTexCoords;
+                              TexCoords.y = (TexCoords.y + aTileNumber) / tileCountTexture[4];
     }
 
     float offsetY = 0.0;

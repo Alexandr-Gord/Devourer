@@ -23,10 +23,10 @@ class Tile {
     @get:Synchronized
     @set:Synchronized
     @GuardedBy("this")
-    var isFogged = true
+    var fogTileId = 0
 
     @get:Synchronized
     @set:Synchronized
     @GuardedBy("this")
-    var fogTileId = 28
+    var highlightingCode = 0
 }

@@ -32,7 +32,7 @@ class GameActivity : AppCompatActivity() {
             DataBindingUtil.setContentView<ActivityGameBinding>(this, R.layout.activity_game)
         //activityMainBinding.setViewModel(new UiViewModel(Game.getInstance()));
         activityMainBinding.viewModel = Game.instance
-        activityMainBinding.executePendingBindings()
+       // activityMainBinding.executePendingBindings()
         //setContentView(R.layout.activity_game);
         initialize()
         drawer = findViewById<View>(R.id.drawer_layout) as DrawerLayout

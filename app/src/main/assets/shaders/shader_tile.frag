@@ -1,4 +1,4 @@
-uniform sampler2D u_texture[4];
+uniform sampler2D u_texture[5];
 
 varying vec2 TexCoords;
 varying float TextureNumber;

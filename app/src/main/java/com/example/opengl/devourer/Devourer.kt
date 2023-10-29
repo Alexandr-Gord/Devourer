@@ -6,6 +6,7 @@ import com.example.opengl.Position
 import com.example.opengl.PositionInd
 import com.example.opengl.Resource
 import com.example.opengl.ResourcesStorage
+import com.example.opengl.constants.DevourerType
 import com.example.opengl.tiles.MineralType
 import com.example.opengl.tiles.TileMap
 import java.nio.FloatBuffer
@@ -58,12 +59,10 @@ class Devourer(private val tileMap: TileMap) {
 
     private val currentAnimationSpriteNumber: Float
         get() {
-            var result = 0f
-            result = when (devourerState) {
+            return when (devourerState) {
                 DevourerState.NORMAL -> NORMAL_PHASES[animationPhase]
                 DevourerState.EATING -> EATING_PHASES[animationPhase]
             }.toFloat()
-            return result
         }
 
     private fun setDevourerState(newDevourerState: DevourerState) {
@@ -103,11 +102,12 @@ class Devourer(private val tileMap: TileMap) {
         }
     }
 
-    fun placeDevourer(indX: Int, indY: Int) {
+    fun placeDevourer(indX: Int, indY: Int, devourerType: DevourerType) {
+        if (!isPlaceable(indX, indY, devourerType)) return
+        tileMap.placeDevourerTile(indX, indY, devourerType)
         if (tileMap.getTile(indX, indY)!!.mineral != null) { // is mineral
             startEatingMineral(indX, indY)
         } else {
-            tileMap.placeDevourerTile(indX, indY)
             devourerStructure.addDevourerNode(indX, indY, tileMap)
             Game.instance.setMessage1(
                 "indX:" + indX + " indY:" + indY + " tile:" + tileMap.getTile(
@@ -118,8 +118,29 @@ class Devourer(private val tileMap: TileMap) {
         }
     }
 
+    private fun isPlaceable(
+        mapIndX: Int,
+        mapIndY: Int,
+        devourerType: DevourerType
+    ): Boolean {
+        when (devourerType) {
+            DevourerType.BASE -> {
+                if (tileMap.getTile(mapIndX, mapIndY)?.basis != null) {
+                    return tileMap.isNearEntityExist(mapIndX, mapIndY)
+                }
+            }
+            DevourerType.PIPE -> {
+                return tileMap.isNearEntityExist(mapIndX, mapIndY)
+            }
+            DevourerType.GLOW -> {
+                return true //TODO implement
+            }
+        }
+        return false
+    }
+
     private fun startEatingMineral(indX: Int, indY: Int) {
-        tileMap.placeDevourerTile(indX, indY)
+        //tileMap.placeDevourerTile(indX, indY)
         devourerStructure.addDevourerNode(indX, indY, tileMap)
         val devourerNode = devourerStructure.getDevourerNode(indX, indY)
         if (devourerNode != null) {

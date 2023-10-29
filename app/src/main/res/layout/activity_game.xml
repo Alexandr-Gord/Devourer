@@ -53,7 +53,7 @@
                 android:text="@={viewModel.message2}"
                 android:textColor="@color/white" />
 
-            <com.example.opengl.SelectButton
+            <com.example.opengl.views.SelectActionButton
                 android:id="@+id/buttonSelect"
                 android:layout_width="140dp"
                 android:layout_height="60dp"
@@ -133,6 +133,30 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/menu_btn" />
+
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@+id/buttonSelect">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:orientation="horizontal">
+
+                    <com.example.opengl.views.SelectDevourerTypeButton
+                        android:id="@+id/buttonSelectDevourerType"
+                        android:layout_width="162dp"
+                        android:layout_height="60dp"
+                        android:background="@android:color/transparent"
+                        android:scaleType="fitXY" />
+                </LinearLayout>
+            </HorizontalScrollView>
         </RelativeLayout>
 
         <com.google.android.material.navigation.NavigationView

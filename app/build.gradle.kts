@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -37,6 +38,7 @@ dependencies {
     implementation ("androidx.constraintlayout:constraintlayout:2.1.3")
     implementation ("net.jcip:jcip-annotations:1.0")
     implementation ("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:+")
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.3")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")

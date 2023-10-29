@@ -15,7 +15,8 @@ class RenderTileObjects(private val context: Context) {
     private var tilesDataBuffer: ShortBuffer? = null
     private var textureBasis: Texture? = null
     private var textureMineral: Texture? = null
-    private var textureEntity: Texture? = null
+    private var textureDevourerBase: Texture? = null
+    private var textureDevourerPipe: Texture? = null
     private var textureFog: Texture? = null
     private var vertexArrayObjectTile = 0
     private var vertexBufferObjectInstancedTile = 0
@@ -28,9 +29,10 @@ class RenderTileObjects(private val context: Context) {
         } catch (e: IOException) {
             null
         }
-        textureBasis = Texture.create(context, R.drawable.base_texture, 2)
+        textureBasis = Texture.create(context, R.drawable.base_texture, 3)
         textureMineral = Texture.create(context, R.drawable.mineral_texture, 3)
-        textureEntity = Texture.create(context, R.drawable.dev_texture, 64)
+        textureDevourerBase = Texture.create(context, R.drawable.dev_texture, 64)
+        textureDevourerPipe = Texture.create(context, R.drawable.dev_pipe_texture, 64)
         textureFog = Texture.create(context, R.drawable.fog_texture, 29)
     }
 
@@ -51,18 +53,20 @@ class RenderTileObjects(private val context: Context) {
         GLES30.glBindVertexArray(vertexArrayObjectTile)
         shaderTile!!.setMatrix4("projection", mProjectionMatrix)
         shaderTile!!.setMatrix4("model", mModelMatrix)
-        val tileCounts = FloatArray(4)
+        val tileCounts = FloatArray(5)
         tileCounts[0] = textureBasis!!.tilesCount.toFloat()
         tileCounts[1] = textureMineral!!.tilesCount.toFloat()
-        tileCounts[2] = textureEntity!!.tilesCount.toFloat()
+        tileCounts[2] = textureDevourerBase!!.tilesCount.toFloat()
         tileCounts[3] = textureFog!!.tilesCount.toFloat()
+        tileCounts[4] = textureDevourerPipe!!.tilesCount.toFloat()
         shaderTile!!.setFloatArray("tileCountTexture[0]", tileCounts)
-        val textures = intArrayOf(0, 1, 2, 3)
+        val textures = intArrayOf(0, 1, 2, 3, 4)
         shaderTile!!.setIntArray("u_texture[0]", textures)
         textureBasis!!.use(GLES20.GL_TEXTURE0)
         textureMineral!!.use(GLES20.GL_TEXTURE0 + 1)
-        textureEntity!!.use(GLES20.GL_TEXTURE0 + 2)
+        textureDevourerBase!!.use(GLES20.GL_TEXTURE0 + 2)
         textureFog!!.use(GLES20.GL_TEXTURE0 + 3)
+        textureDevourerPipe!!.use(GLES20.GL_TEXTURE0 + 4)
         GLES30.glDrawArraysInstanced(GLES20.GL_TRIANGLES, 0, 6, tilesDataBuffer!!.capacity() / 4)
         GLES30.glBindVertexArray(0)
     }
